@@ -11,12 +11,6 @@ import {
   Moon,
   ArrowUp,
   Mail,
-  Phone,
-  MapPin,
-  Github,
-  Linkedin,
-  Twitter,
-  ExternalLink,
   Download,
   Send,
   ChevronRight,
@@ -30,10 +24,16 @@ import {
   User,
   Star,
   ArrowRight,
+  Github,
+  Linkedin,
+  Twitter,
   Instagram,
   Youtube,
   Facebook,
   Dribbble,
+  ExternalLink,
+  Quote,
+  StickyNote,
 } from "lucide-react";
 
 /* ──────────────────────── Data ──────────────────────── */
@@ -42,9 +42,9 @@ const NAV_LINKS = [
   { label: "About", href: "#about" },
   { label: "Education", href: "#education" },
   { label: "Experience", href: "#experience" },
+  { label: "Gallery", href: "#gallery" },
   { label: "Skills", href: "#skills" },
   { label: "Projects", href: "#projects" },
-  { label: "Gallery", href: "#gallery" },
   { label: "Blog", href: "#blog" },
   { label: "Store", href: "#store" },
   { label: "Contact", href: "#contact" },
@@ -93,22 +93,49 @@ const EXPERIENCE = [
 ];
 
 const SKILLS = [
-  "React",
-  "Next.js",
-  "TypeScript",
-  "Node.js",
-  "Python",
-  "PostgreSQL",
-  "MongoDB",
-  "Tailwind CSS",
-  "Docker",
-  "AWS",
-  "GraphQL",
-  "Redis",
-  "Figma",
-  "Git",
-  "CI/CD",
-  "Prisma",
+  "React", "Next.js", "TypeScript", "Node.js", "Python", "PostgreSQL",
+  "MongoDB", "Tailwind CSS", "Docker", "AWS", "GraphQL", "Redis",
+  "Figma", "Git", "CI/CD", "Prisma",
+];
+
+const GALLERY_IMAGES = [
+  { src: "https://picsum.photos/seed/portfolio1/400/300", alt: "Mountain landscape" },
+  { src: "https://picsum.photos/seed/portfolio2/400/300", alt: "City skyline" },
+  { src: "https://picsum.photos/seed/portfolio3/400/300", alt: "Ocean waves" },
+  { src: "https://picsum.photos/seed/portfolio4/400/300", alt: "Forest trail" },
+];
+
+const GALLERY_NOTES = [
+  {
+    title: "On Building for Scale",
+    content: "The best architectures emerge not from upfront design, but from iterative refinement. Start simple, measure often, and refactor ruthlessly.",
+    date: "May 20, 2026",
+  },
+  {
+    title: "Design is How It Works",
+    content: "Beautiful interfaces that don't solve real problems are just decoration. Always start with the user's pain point and work backwards to the solution.",
+    date: "Apr 15, 2026",
+  },
+  {
+    title: "The Power of Boring Tech",
+    content: "Choose proven technologies for your stack. Innovation belongs in your product, not your infrastructure. Boring tech lets you move fast with confidence.",
+    date: "Mar 08, 2026",
+  },
+];
+
+const GALLERY_QUOTES = [
+  {
+    text: "Code is like humor. When you have to explain it, it's bad.",
+    context: "On writing clean code",
+  },
+  {
+    text: "First, solve the problem. Then, write the code.",
+    context: "On thinking before coding",
+  },
+  {
+    text: "Simplicity is the soul of efficiency.",
+    context: "On keeping things simple",
+  },
 ];
 
 const PROJECTS = [
@@ -118,6 +145,7 @@ const PROJECTS = [
     tags: ["Next.js", "OpenAI", "Socket.io"],
     demo: "#",
     github: "#",
+    image: "https://picsum.photos/seed/proj1/600/340",
   },
   {
     name: "FinTrack",
@@ -125,6 +153,7 @@ const PROJECTS = [
     tags: ["React", "D3.js", "Node.js"],
     demo: "#",
     github: "#",
+    image: "https://picsum.photos/seed/proj2/600/340",
   },
   {
     name: "DevChat",
@@ -132,6 +161,7 @@ const PROJECTS = [
     tags: ["TypeScript", "WebSocket", "Redis"],
     demo: "#",
     github: "#",
+    image: "https://picsum.photos/seed/proj3/600/340",
   },
   {
     name: "EcoMarket",
@@ -139,32 +169,8 @@ const PROJECTS = [
     tags: ["Next.js", "Stripe", "Prisma"],
     demo: "#",
     github: "#",
+    image: "https://picsum.photos/seed/proj4/600/340",
   },
-  {
-    name: "MediScan",
-    description: "Health monitoring app with ML-powered symptom analysis",
-    tags: ["Python", "TensorFlow", "React"],
-    demo: "#",
-    github: "#",
-  },
-  {
-    name: "LearnHub",
-    description: "Online learning platform with interactive coding challenges",
-    tags: ["Next.js", "Monaco", "PostgreSQL"],
-    demo: "#",
-    github: "#",
-  },
-];
-
-const GALLERY_IMAGES = [
-  { src: "https://picsum.photos/seed/portfolio1/400/300", alt: "Mountain landscape" },
-  { src: "https://picsum.photos/seed/portfolio2/400/300", alt: "City skyline" },
-  { src: "https://picsum.photos/seed/portfolio3/400/300", alt: "Ocean waves" },
-  { src: "https://picsum.photos/seed/portfolio4/400/300", alt: "Forest trail" },
-  { src: "https://picsum.photos/seed/portfolio5/400/300", alt: "Desert dunes" },
-  { src: "https://picsum.photos/seed/portfolio6/400/300", alt: "Northern lights" },
-  { src: "https://picsum.photos/seed/portfolio7/400/300", alt: "Tropical beach" },
-  { src: "https://picsum.photos/seed/portfolio8/400/300", alt: "Snowy peaks" },
 ];
 
 const BLOG_POSTS = [
@@ -173,18 +179,21 @@ const BLOG_POSTS = [
     date: "May 15, 2026",
     excerpt: "A deep dive into leveraging server actions for type-safe, performant API design.",
     link: "#",
+    image: "https://picsum.photos/seed/blog1/600/340",
   },
   {
     title: "The Future of CSS: What's Coming in 2027",
     date: "Apr 28, 2026",
     excerpt: "Exploring upcoming CSS features that will transform how we build interfaces.",
     link: "#",
+    image: "https://picsum.photos/seed/blog2/600/340",
   },
   {
     title: "Why I Switched from Redux to Zustand",
     date: "Apr 10, 2026",
     excerpt: "My journey simplifying state management with a lighter, more intuitive library.",
     link: "#",
+    image: "https://picsum.photos/seed/blog3/600/340",
   },
 ];
 
@@ -204,6 +213,15 @@ const STORE_ITEMS = [
     price: "$39",
     image: "https://picsum.photos/seed/store3/300/200",
   },
+];
+
+/* ─── Gallery Tabs ─── */
+type GalleryTab = "images" | "notes" | "quotes";
+
+const GALLERY_TABS: { key: GalleryTab; label: string; icon: React.ElementType }[] = [
+  { key: "images", label: "Images", icon: ImageIcon },
+  { key: "notes", label: "Notes", icon: StickyNote },
+  { key: "quotes", label: "Quotes", icon: Quote },
 ];
 
 /* ──────────────────── Fade-in Wrapper ──────────────────── */
@@ -284,14 +302,13 @@ export default function PortfolioPage() {
   const [showTop, setShowTop] = useState(false);
   const [lightbox, setLightbox] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
+  const [galleryTab, setGalleryTab] = useState<GalleryTab>("images");
 
-  // Track mount state via ref to avoid set-state-in-effect lint
   const mountedRef = useRef(false);
 
   useEffect(() => {
     if (!mountedRef.current) {
       mountedRef.current = true;
-      // Use flushSync-free pattern: defer to next microtask
       queueMicrotask(() => setMounted(true));
     }
   }, []);
@@ -302,7 +319,6 @@ export default function PortfolioPage() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Close mobile menu on resize
   useEffect(() => {
     const onResize = () => {
       if (window.innerWidth >= 768) setMobileOpen(false);
@@ -312,7 +328,6 @@ export default function PortfolioPage() {
   }, []);
 
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
-
   const toggleTheme = () => setTheme(theme === "dark" ? "light" : "dark");
 
   return (
@@ -320,13 +335,9 @@ export default function PortfolioPage() {
       {/* ─── Navbar ─── */}
       <header className="sticky top-0 z-50 backdrop-blur-md bg-background/80 border-b border-border">
         <nav className="max-w-6xl mx-auto flex items-center justify-between h-14 px-4">
-          {/* Logo */}
           <a href="#" className="text-lg font-bold text-foreground tracking-tight">
-            <span className="text-emerald">A</span>lex
-            <span className="text-emerald">.</span>
+            <span className="text-emerald">A</span>lex<span className="text-emerald">.</span>
           </a>
-
-          {/* Desktop links */}
           <ul className="hidden md:flex items-center gap-1">
             {NAV_LINKS.map((l) => (
               <li key={l.href}>
@@ -339,25 +350,16 @@ export default function PortfolioPage() {
               </li>
             ))}
           </ul>
-
-          {/* Right actions */}
           <div className="flex items-center gap-2">
-            {/* Dark mode toggle */}
             {mounted && (
               <button
                 onClick={toggleTheme}
                 aria-label="Toggle theme"
                 className="w-9 h-9 rounded-lg border border-border flex items-center justify-center hover:border-emerald transition-colors"
               >
-                {theme === "dark" ? (
-                  <Sun className="w-4 h-4 text-yellow-500" />
-                ) : (
-                  <Moon className="w-4 h-4 text-muted-foreground" />
-                )}
+                {theme === "dark" ? <Sun className="w-4 h-4 text-yellow-500" /> : <Moon className="w-4 h-4 text-muted-foreground" />}
               </button>
             )}
-
-            {/* Hamburger */}
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
               className="md:hidden w-9 h-9 rounded-lg border border-border flex items-center justify-center hover:border-emerald transition-colors"
@@ -367,8 +369,6 @@ export default function PortfolioPage() {
             </button>
           </div>
         </nav>
-
-        {/* Mobile menu */}
         <AnimatePresence>
           {mobileOpen && (
             <motion.div
@@ -381,11 +381,7 @@ export default function PortfolioPage() {
               <ul className="flex flex-col px-4 py-2">
                 {NAV_LINKS.map((l) => (
                   <li key={l.href}>
-                    <a
-                      href={l.href}
-                      onClick={() => setMobileOpen(false)}
-                      className="block py-2.5 text-sm font-medium text-muted-foreground hover:text-emerald transition-colors"
-                    >
+                    <a href={l.href} onClick={() => setMobileOpen(false)} className="block py-2.5 text-sm font-medium text-muted-foreground hover:text-emerald transition-colors">
                       {l.label}
                     </a>
                   </li>
@@ -402,7 +398,6 @@ export default function PortfolioPage() {
         <FadeIn>
           <CardShell className="p-6 md:p-8">
             <div className="flex flex-col md:flex-row items-center gap-6">
-              {/* Left */}
               <div className="flex-1 text-center md:text-left">
                 <h1 className="text-3xl md:text-4xl font-bold text-foreground leading-tight">
                   Hi, I&apos;m <span className="text-emerald">Alex Morgan</span>
@@ -411,30 +406,17 @@ export default function PortfolioPage() {
                   Full-Stack Developer &amp; Designer — crafting elegant digital experiences with modern web technologies.
                 </p>
                 <div className="mt-4 flex flex-wrap gap-3 justify-center md:justify-start">
-                  <a
-                    href="#contact"
-                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald text-white text-sm font-semibold hover:bg-emerald-hover transition-colors shadow-sm"
-                  >
-                    <Mail className="w-4 h-4" />
-                    Contact Me
+                  <a href="#contact" className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald text-white text-sm font-semibold hover:bg-emerald-hover transition-colors shadow-sm">
+                    <Mail className="w-4 h-4" /> Contact Me
                   </a>
-                  <a
-                    href="#"
-                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-emerald text-emerald text-sm font-semibold hover:bg-emerald/5 transition-colors"
-                  >
-                    <Download className="w-4 h-4" />
-                    Download CV
+                  <a href="#" className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-emerald text-emerald text-sm font-semibold hover:bg-emerald/5 transition-colors">
+                    <Download className="w-4 h-4" /> Download CV
                   </a>
                 </div>
               </div>
-              {/* Right – avatar */}
               <div className="shrink-0">
                 <div className="w-28 h-28 md:w-36 md:h-36 rounded-full border-2 border-emerald/30 overflow-hidden shadow-md">
-                  <img
-                    src="https://picsum.photos/seed/avatar42/300/300"
-                    alt="Alex Morgan profile photo"
-                    className="w-full h-full object-cover"
-                  />
+                  <img src="https://picsum.photos/seed/avatar42/300/300" alt="Alex Morgan profile photo" className="w-full h-full object-cover" />
                 </div>
               </div>
             </div>
@@ -442,7 +424,7 @@ export default function PortfolioPage() {
         </FadeIn>
 
         {/* ─── About ─── */}
-        <FadeIn id="about">
+        <FadeIn>
           <CardShell className="p-6" id="about">
             <SectionHeading icon={User} title="About Me" />
             <p className="text-sm leading-relaxed text-muted-foreground">
@@ -455,13 +437,12 @@ export default function PortfolioPage() {
         </FadeIn>
 
         {/* ─── Education ─── */}
-        <FadeIn id="education">
+        <FadeIn>
           <CardShell className="p-6" id="education">
             <SectionHeading icon={GraduationCap} title="Education" />
             <div className="relative pl-6 border-l-2 border-emerald/30 space-y-5">
               {EDUCATION.map((e, i) => (
                 <div key={i} className="relative">
-                  {/* Dot */}
                   <span className="absolute -left-[1.55rem] top-1 w-3 h-3 rounded-full bg-emerald border-2 border-background" />
                   <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1">
                     <div>
@@ -478,7 +459,7 @@ export default function PortfolioPage() {
         </FadeIn>
 
         {/* ─── Experience ─── */}
-        <FadeIn id="experience">
+        <FadeIn>
           <CardShell className="p-6" id="experience">
             <SectionHeading icon={Briefcase} title="Experience" />
             <div className="relative pl-6 border-l-2 border-emerald/30 space-y-5">
@@ -499,85 +480,105 @@ export default function PortfolioPage() {
           </CardShell>
         </FadeIn>
 
-        {/* ─── Skills ─── */}
-        <FadeIn id="skills">
-          <CardShell className="p-6" id="skills">
-            <SectionHeading icon={Code2} title="Skills" />
-            <div className="flex flex-wrap gap-2">
-              {SKILLS.map((s, i) => (
-                <span
-                  key={i}
-                  className="px-3 py-1.5 text-xs font-medium text-foreground border border-border rounded-lg hover:border-emerald hover:text-emerald transition-colors cursor-default"
-                >
-                  {s}
-                </span>
-              ))}
-            </div>
-          </CardShell>
-        </FadeIn>
-
-        {/* ─── Projects ─── */}
-        <FadeIn id="projects">
-          <div id="projects">
-            <SectionHeading icon={Star} title="Projects" viewAllHref="/projects" />
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {PROJECTS.map((p, i) => (
-                <FadeIn key={i} delay={i * 0.08}>
-                  <CardShell className="p-5 h-full flex flex-col">
-                    <h3 className="text-sm font-semibold text-foreground">{p.name}</h3>
-                    <p className="text-xs text-muted-foreground mt-1 flex-1">{p.description}</p>
-                    <div className="flex flex-wrap gap-1.5 mt-3">
-                      {p.tags.map((t) => (
-                        <span
-                          key={t}
-                          className="px-2 py-0.5 text-[10px] font-medium text-emerald bg-emerald/10 rounded-md"
-                        >
-                          {t}
-                        </span>
-                      ))}
-                    </div>
-                    <div className="flex gap-3 mt-3">
-                      <a
-                        href={p.demo}
-                        className="inline-flex items-center gap-1 text-xs font-medium text-emerald hover:underline"
-                      >
-                        <ExternalLink className="w-3 h-3" /> Live Demo
-                      </a>
-                      <a
-                        href={p.github}
-                        className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-emerald transition-colors"
-                      >
-                        <Github className="w-3 h-3" /> GitHub
-                      </a>
-                    </div>
-                  </CardShell>
-                </FadeIn>
-              ))}
-            </div>
-          </div>
-        </FadeIn>
-
-        {/* ─── Gallery ─── */}
-        <FadeIn id="gallery">
+        {/* ─── Gallery (moved before Skills) ─── */}
+        <FadeIn>
           <CardShell className="p-6" id="gallery">
             <SectionHeading icon={ImageIcon} title="Gallery" viewAllHref="/gallery" />
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              {GALLERY_IMAGES.map((img, i) => (
+
+            {/* Tab buttons */}
+            <div className="flex gap-1 mb-4">
+              {GALLERY_TABS.map((tab) => (
                 <button
-                  key={i}
-                  onClick={() => setLightbox(img.src)}
-                  className="group relative aspect-[4/3] overflow-hidden rounded-xl border border-border hover:border-emerald transition-colors cursor-pointer"
+                  key={tab.key}
+                  onClick={() => setGalleryTab(tab.key)}
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
+                    galleryTab === tab.key
+                      ? "bg-emerald text-white"
+                      : "border border-border text-muted-foreground hover:border-emerald hover:text-emerald"
+                  }`}
                 >
-                  <img
-                    src={img.src}
-                    alt={img.alt}
-                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                    loading="lazy"
-                  />
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
+                  <tab.icon className="w-3.5 h-3.5" />
+                  {tab.label}
                 </button>
               ))}
             </div>
+
+            {/* Tab content */}
+            <AnimatePresence mode="wait">
+              {galleryTab === "images" && (
+                <motion.div
+                  key="images"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    {GALLERY_IMAGES.map((img, i) => (
+                      <button
+                        key={i}
+                        onClick={() => setLightbox(img.src)}
+                        className="group relative aspect-[4/3] overflow-hidden rounded-xl border border-border hover:border-emerald transition-colors cursor-pointer"
+                      >
+                        <img src={img.src} alt={img.alt} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" loading="lazy" />
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
+                      </button>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+
+              {galleryTab === "notes" && (
+                <motion.div
+                  key="notes"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.2 }}
+                  className="space-y-3"
+                >
+                  {GALLERY_NOTES.map((note, i) => (
+                    <div key={i} className="p-4 rounded-xl border border-border hover:border-emerald transition-colors bg-muted/30">
+                      <div className="flex items-start gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-emerald/10 flex items-center justify-center shrink-0 mt-0.5">
+                          <StickyNote className="w-4 h-4 text-emerald" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-sm font-semibold text-foreground">{note.title}</h4>
+                          <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{note.content}</p>
+                          <span className="text-[10px] text-muted-foreground mt-2 block">{note.date}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </motion.div>
+              )}
+
+              {galleryTab === "quotes" && (
+                <motion.div
+                  key="quotes"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.2 }}
+                  className="space-y-3"
+                >
+                  {GALLERY_QUOTES.map((q, i) => (
+                    <div key={i} className="p-4 rounded-xl border border-border hover:border-emerald transition-colors bg-muted/30">
+                      <div className="flex items-start gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-emerald/10 flex items-center justify-center shrink-0 mt-0.5">
+                          <Quote className="w-4 h-4 text-emerald" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm text-foreground italic leading-relaxed">&ldquo;{q.text}&rdquo;</p>
+                          <span className="text-[10px] text-emerald font-medium mt-2 block">&mdash; {q.context}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </CardShell>
         </FadeIn>
 
@@ -611,26 +612,80 @@ export default function PortfolioPage() {
           )}
         </AnimatePresence>
 
-        {/* ─── Blog ─── */}
-        <FadeIn id="blog">
+        {/* ─── Skills ─── */}
+        <FadeIn>
+          <CardShell className="p-6" id="skills">
+            <SectionHeading icon={Code2} title="Skills" />
+            <div className="flex flex-wrap gap-2">
+              {SKILLS.map((s, i) => (
+                <span
+                  key={i}
+                  className="px-3 py-1.5 text-xs font-medium text-foreground border border-border rounded-lg hover:border-emerald hover:text-emerald transition-colors cursor-default"
+                >
+                  {s}
+                </span>
+              ))}
+            </div>
+          </CardShell>
+        </FadeIn>
+
+        {/* ─── Projects (4 with featured images) ─── */}
+        <FadeIn>
+          <div id="projects">
+            <SectionHeading icon={Star} title="Projects" viewAllHref="/projects" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {PROJECTS.map((p, i) => (
+                <FadeIn key={i} delay={i * 0.08}>
+                  <CardShell className="overflow-hidden h-full flex flex-col">
+                    <div className="aspect-[16/9] overflow-hidden">
+                      <img src={p.image} alt={p.name} className="w-full h-full object-cover transition-transform duration-300 hover:scale-105" loading="lazy" />
+                    </div>
+                    <div className="p-5 flex flex-col flex-1">
+                      <h3 className="text-sm font-semibold text-foreground">{p.name}</h3>
+                      <p className="text-xs text-muted-foreground mt-1 flex-1">{p.description}</p>
+                      <div className="flex flex-wrap gap-1.5 mt-3">
+                        {p.tags.map((t) => (
+                          <span key={t} className="px-2 py-0.5 text-[10px] font-medium text-emerald bg-emerald/10 rounded-md">{t}</span>
+                        ))}
+                      </div>
+                      <div className="flex gap-3 mt-3">
+                        <a href={p.demo} className="inline-flex items-center gap-1 text-xs font-medium text-emerald hover:underline">
+                          <ExternalLink className="w-3 h-3" /> Live Demo
+                        </a>
+                        <a href={p.github} className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-emerald transition-colors">
+                          <Github className="w-3 h-3" /> GitHub
+                        </a>
+                      </div>
+                    </div>
+                  </CardShell>
+                </FadeIn>
+              ))}
+            </div>
+          </div>
+        </FadeIn>
+
+        {/* ─── Blog (with featured images) ─── */}
+        <FadeIn>
           <div id="blog">
             <SectionHeading icon={FileText} title="Blog" viewAllHref="/blog" />
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {BLOG_POSTS.map((post, i) => (
                 <FadeIn key={i} delay={i * 0.08}>
-                  <CardShell className="p-5 h-full flex flex-col">
-                    <h3 className="text-sm font-semibold text-foreground leading-snug">{post.title}</h3>
-                    <div className="flex items-center gap-1.5 mt-1.5">
-                      <Calendar className="w-3 h-3 text-muted-foreground" />
-                      <span className="text-[10px] text-muted-foreground">{post.date}</span>
+                  <CardShell className="overflow-hidden h-full flex flex-col">
+                    <div className="aspect-[16/9] overflow-hidden">
+                      <img src={post.image} alt={post.title} className="w-full h-full object-cover" loading="lazy" />
                     </div>
-                    <p className="text-xs text-muted-foreground mt-2 flex-1">{post.excerpt}</p>
-                    <a
-                      href={post.link}
-                      className="inline-flex items-center gap-1 text-xs font-medium text-emerald mt-3 hover:underline"
-                    >
-                      Read More <ChevronRight className="w-3 h-3" />
-                    </a>
+                    <div className="p-5 flex flex-col flex-1">
+                      <h3 className="text-sm font-semibold text-foreground leading-snug">{post.title}</h3>
+                      <div className="flex items-center gap-1.5 mt-1.5">
+                        <Calendar className="w-3 h-3 text-muted-foreground" />
+                        <span className="text-[10px] text-muted-foreground">{post.date}</span>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-2 flex-1">{post.excerpt}</p>
+                      <a href={post.link} className="inline-flex items-center gap-1 text-xs font-medium text-emerald mt-3 hover:underline">
+                        Read More <ChevronRight className="w-3 h-3" />
+                      </a>
+                    </div>
                   </CardShell>
                 </FadeIn>
               ))}
@@ -639,7 +694,7 @@ export default function PortfolioPage() {
         </FadeIn>
 
         {/* ─── Store ─── */}
-        <FadeIn id="store">
+        <FadeIn>
           <div id="store">
             <SectionHeading icon={ShoppingCart} title="Store" viewAllHref="/store" />
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -647,12 +702,7 @@ export default function PortfolioPage() {
                 <FadeIn key={i} delay={i * 0.08}>
                   <CardShell className="overflow-hidden">
                     <div className="aspect-[3/2] overflow-hidden">
-                      <img
-                        src={item.image}
-                        alt={item.name}
-                        className="w-full h-full object-cover"
-                        loading="lazy"
-                      />
+                      <img src={item.image} alt={item.name} className="w-full h-full object-cover" loading="lazy" />
                     </div>
                     <div className="p-4 flex items-center justify-between">
                       <div>
@@ -675,7 +725,6 @@ export default function PortfolioPage() {
           <CardShell className="p-6" id="socials">
             <SectionHeading icon={User} title="Connect With Me" />
             <div className="space-y-3">
-              {/* First row — 4 icons */}
               <div className="flex justify-center gap-3">
                 {[
                   { icon: Github, href: "#", label: "GitHub" },
@@ -683,29 +732,18 @@ export default function PortfolioPage() {
                   { icon: Twitter, href: "#", label: "Twitter / X" },
                   { icon: Instagram, href: "#", label: "Instagram" },
                 ].map(({ icon: Icon, href, label }) => (
-                  <a
-                    key={label}
-                    href={href}
-                    aria-label={label}
-                    className="w-12 h-12 rounded-xl border border-border flex items-center justify-center text-muted-foreground hover:border-emerald hover:text-emerald hover:bg-emerald/5 transition-colors"
-                  >
+                  <a key={label} href={href} aria-label={label} className="w-12 h-12 rounded-xl border border-border flex items-center justify-center text-muted-foreground hover:border-emerald hover:text-emerald hover:bg-emerald/5 transition-colors">
                     <Icon className="w-5 h-5" />
                   </a>
                 ))}
               </div>
-              {/* Second row — 3 icons */}
               <div className="flex justify-center gap-3">
                 {[
                   { icon: Youtube, href: "#", label: "YouTube" },
                   { icon: Facebook, href: "#", label: "Facebook" },
                   { icon: Dribbble, href: "#", label: "Dribbble" },
                 ].map(({ icon: Icon, href, label }) => (
-                  <a
-                    key={label}
-                    href={href}
-                    aria-label={label}
-                    className="w-12 h-12 rounded-xl border border-border flex items-center justify-center text-muted-foreground hover:border-emerald hover:text-emerald hover:bg-emerald/5 transition-colors"
-                  >
+                  <a key={label} href={href} aria-label={label} className="w-12 h-12 rounded-xl border border-border flex items-center justify-center text-muted-foreground hover:border-emerald hover:text-emerald hover:bg-emerald/5 transition-colors">
                     <Icon className="w-5 h-5" />
                   </a>
                 ))}
@@ -745,12 +783,7 @@ export default function PortfolioPage() {
               { icon: Linkedin, href: "#", label: "LinkedIn" },
               { icon: Twitter, href: "#", label: "Twitter" },
             ].map(({ icon: Icon, href, label }) => (
-              <a
-                key={label}
-                href={href}
-                aria-label={label}
-                className="hover:text-emerald transition-colors"
-              >
+              <a key={label} href={href} aria-label={label} className="hover:text-emerald transition-colors">
                 <Icon className="w-4 h-4" />
               </a>
             ))}
