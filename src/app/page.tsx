@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useTheme } from "next-themes";
 import { motion, AnimatePresence, useInView } from "framer-motion";
+import Link from "next/link";
 import {
   Menu,
   X,
@@ -28,6 +29,11 @@ import {
   Code2,
   User,
   Star,
+  ArrowRight,
+  Instagram,
+  Youtube,
+  Facebook,
+  Dribbble,
 } from "lucide-react";
 
 /* ──────────────────────── Data ──────────────────────── */
@@ -229,13 +235,31 @@ function FadeIn({
 
 /* ──────────────────── Section Heading ──────────────────── */
 
-function SectionHeading({ icon: Icon, title }: { icon: React.ElementType; title: string }) {
+function SectionHeading({
+  icon: Icon,
+  title,
+  viewAllHref,
+}: {
+  icon: React.ElementType;
+  title: string;
+  viewAllHref?: string;
+}) {
   return (
-    <div className="flex items-center gap-2 mb-5">
-      <div className="w-8 h-8 rounded-lg bg-emerald/10 flex items-center justify-center">
-        <Icon className="w-4 h-4 text-emerald" />
+    <div className="flex items-center justify-between mb-5">
+      <div className="flex items-center gap-2">
+        <div className="w-8 h-8 rounded-lg bg-emerald/10 flex items-center justify-center">
+          <Icon className="w-4 h-4 text-emerald" />
+        </div>
+        <h2 className="text-xl font-semibold text-foreground">{title}</h2>
       </div>
-      <h2 className="text-xl font-semibold text-foreground">{title}</h2>
+      {viewAllHref && (
+        <Link
+          href={viewAllHref}
+          className="inline-flex items-center gap-1 text-xs font-medium text-emerald hover:underline"
+        >
+          View All <ArrowRight className="w-3 h-3" />
+        </Link>
+      )}
     </div>
   );
 }
@@ -495,7 +519,7 @@ export default function PortfolioPage() {
         {/* ─── Projects ─── */}
         <FadeIn id="projects">
           <div id="projects">
-            <SectionHeading icon={Star} title="Projects" />
+            <SectionHeading icon={Star} title="Projects" viewAllHref="/projects" />
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {PROJECTS.map((p, i) => (
                 <FadeIn key={i} delay={i * 0.08}>
@@ -536,7 +560,7 @@ export default function PortfolioPage() {
         {/* ─── Gallery ─── */}
         <FadeIn id="gallery">
           <CardShell className="p-6" id="gallery">
-            <SectionHeading icon={ImageIcon} title="Gallery" />
+            <SectionHeading icon={ImageIcon} title="Gallery" viewAllHref="/gallery" />
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {GALLERY_IMAGES.map((img, i) => (
                 <button
@@ -590,7 +614,7 @@ export default function PortfolioPage() {
         {/* ─── Blog ─── */}
         <FadeIn id="blog">
           <div id="blog">
-            <SectionHeading icon={FileText} title="Blog" />
+            <SectionHeading icon={FileText} title="Blog" viewAllHref="/blog" />
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {BLOG_POSTS.map((post, i) => (
                 <FadeIn key={i} delay={i * 0.08}>
@@ -617,7 +641,7 @@ export default function PortfolioPage() {
         {/* ─── Store ─── */}
         <FadeIn id="store">
           <div id="store">
-            <SectionHeading icon={ShoppingCart} title="Store" />
+            <SectionHeading icon={ShoppingCart} title="Store" viewAllHref="/store" />
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {STORE_ITEMS.map((item, i) => (
                 <FadeIn key={i} delay={i * 0.08}>
@@ -646,108 +670,68 @@ export default function PortfolioPage() {
           </div>
         </FadeIn>
 
-        {/* ─── Contact ─── */}
-        <FadeIn id="contact">
-          <CardShell className="p-6" id="contact">
-            <SectionHeading icon={Mail} title="Contact" />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Form */}
-              <form
-                className="space-y-3"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  alert("Message sent! (Demo)");
-                }}
-              >
-                <div>
-                  <label htmlFor="name" className="sr-only">Name</label>
-                  <input
-                    id="name"
-                    type="text"
-                    placeholder="Your Name"
-                    required
-                    className="w-full px-4 py-2.5 rounded-xl border border-border bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:border-emerald focus:ring-1 focus:ring-emerald outline-none transition-colors"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="email" className="sr-only">Email</label>
-                  <input
-                    id="email"
-                    type="email"
-                    placeholder="Your Email"
-                    required
-                    className="w-full px-4 py-2.5 rounded-xl border border-border bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:border-emerald focus:ring-1 focus:ring-emerald outline-none transition-colors"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="message" className="sr-only">Message</label>
-                  <textarea
-                    id="message"
-                    rows={4}
-                    placeholder="Your Message"
-                    required
-                    className="w-full px-4 py-2.5 rounded-xl border border-border bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:border-emerald focus:ring-1 focus:ring-emerald outline-none transition-colors resize-none"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald text-white text-sm font-semibold hover:bg-emerald-hover transition-colors"
-                >
-                  <Send className="w-4 h-4" />
-                  Send Message
-                </button>
-              </form>
-
-              {/* Contact info */}
-              <div className="space-y-4">
-                <div className="flex items-start gap-3">
-                  <div className="w-9 h-9 rounded-lg border border-border flex items-center justify-center shrink-0 group-hover:border-emerald transition-colors">
-                    <Mail className="w-4 h-4 text-muted-foreground group-hover:text-emerald" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground">Email</p>
-                    <p className="text-sm font-medium text-foreground">alex.morgan@email.com</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="w-9 h-9 rounded-lg border border-border flex items-center justify-center shrink-0">
-                    <Phone className="w-4 h-4 text-muted-foreground" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground">Phone</p>
-                    <p className="text-sm font-medium text-foreground">+1 (555) 123-4567</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="w-9 h-9 rounded-lg border border-border flex items-center justify-center shrink-0">
-                    <MapPin className="w-4 h-4 text-muted-foreground" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground">Location</p>
-                    <p className="text-sm font-medium text-foreground">San Francisco, CA</p>
-                  </div>
-                </div>
-
-                {/* Social */}
-                <div className="flex gap-2 pt-2">
-                  {[
-                    { icon: Github, href: "#", label: "GitHub" },
-                    { icon: Linkedin, href: "#", label: "LinkedIn" },
-                    { icon: Twitter, href: "#", label: "Twitter" },
-                  ].map(({ icon: Icon, href, label }) => (
-                    <a
-                      key={label}
-                      href={href}
-                      aria-label={label}
-                      className="w-9 h-9 rounded-lg border border-border flex items-center justify-center text-muted-foreground hover:border-emerald hover:text-emerald transition-colors"
-                    >
-                      <Icon className="w-4 h-4" />
-                    </a>
-                  ))}
-                </div>
+        {/* ─── Social Media Card ─── */}
+        <FadeIn id="socials">
+          <CardShell className="p-6" id="socials">
+            <SectionHeading icon={User} title="Connect With Me" />
+            <div className="space-y-3">
+              {/* First row — 4 icons */}
+              <div className="flex justify-center gap-3">
+                {[
+                  { icon: Github, href: "#", label: "GitHub" },
+                  { icon: Linkedin, href: "#", label: "LinkedIn" },
+                  { icon: Twitter, href: "#", label: "Twitter / X" },
+                  { icon: Instagram, href: "#", label: "Instagram" },
+                ].map(({ icon: Icon, href, label }) => (
+                  <a
+                    key={label}
+                    href={href}
+                    aria-label={label}
+                    className="w-12 h-12 rounded-xl border border-border flex items-center justify-center text-muted-foreground hover:border-emerald hover:text-emerald hover:bg-emerald/5 transition-colors"
+                  >
+                    <Icon className="w-5 h-5" />
+                  </a>
+                ))}
+              </div>
+              {/* Second row — 3 icons */}
+              <div className="flex justify-center gap-3">
+                {[
+                  { icon: Youtube, href: "#", label: "YouTube" },
+                  { icon: Facebook, href: "#", label: "Facebook" },
+                  { icon: Dribbble, href: "#", label: "Dribbble" },
+                ].map(({ icon: Icon, href, label }) => (
+                  <a
+                    key={label}
+                    href={href}
+                    aria-label={label}
+                    className="w-12 h-12 rounded-xl border border-border flex items-center justify-center text-muted-foreground hover:border-emerald hover:text-emerald hover:bg-emerald/5 transition-colors"
+                  >
+                    <Icon className="w-5 h-5" />
+                  </a>
+                ))}
               </div>
             </div>
           </CardShell>
+        </FadeIn>
+
+        {/* ─── Contact CTA Card ─── */}
+        <FadeIn id="contact">
+          <Link href="/contact" id="contact">
+            <CardShell className="p-6 cursor-pointer group">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-emerald/10 flex items-center justify-center shrink-0 group-hover:bg-emerald/20 transition-colors">
+                  <Send className="w-5 h-5 text-emerald" />
+                </div>
+                <div className="flex-1">
+                  <h2 className="text-lg font-semibold text-foreground">Contact Me</h2>
+                  <p className="text-sm text-muted-foreground mt-0.5">
+                    Have a project in mind? Let&apos;s collaborate and create something extraordinary together.
+                  </p>
+                </div>
+                <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-emerald group-hover:translate-x-1 transition-all shrink-0" />
+              </div>
+            </CardShell>
+          </Link>
         </FadeIn>
       </main>
 
