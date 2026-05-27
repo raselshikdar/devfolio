@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useTheme } from "next-themes";
 import { motion, AnimatePresence, useInView } from "framer-motion";
 import Link from "next/link";
@@ -14,6 +14,7 @@ import {
   Download,
   Send,
   ChevronRight,
+  ChevronLeft,
   GraduationCap,
   Briefcase,
   ShoppingCart,
@@ -36,7 +37,7 @@ import {
   StickyNote,
 } from "lucide-react";
 
-/* ──────────────────────── Data ──────────────────────── */
+/* ──────────────────────── Fallback Data ──────────────────────── */
 
 const NAV_LINKS = [
   { label: "About", href: "#about" },
@@ -50,169 +51,86 @@ const NAV_LINKS = [
   { label: "Contact", href: "#contact" },
 ];
 
-const EDUCATION = [
-  {
-    degree: "M.Sc. Computer Science",
-    institute: "Stanford University",
-    year: "2019 – 2021",
-    detail: "Specialized in Machine Learning & Distributed Systems",
-  },
-  {
-    degree: "B.Sc. Software Engineering",
-    institute: "MIT",
-    year: "2015 – 2019",
-    detail: "Graduated with Honors, GPA 3.9/4.0",
-  },
-  {
-    degree: "High School Diploma",
-    institute: "Phillips Academy Andover",
-    year: "2011 – 2015",
-    detail: "Focus on Mathematics and Computer Science",
-  },
+const FALLBACK_EDUCATION = [
+  { id: "e1", degree: "M.Sc. Computer Science", institute: "Stanford University", year: "2019 – 2021", detail: "Specialized in Machine Learning & Distributed Systems" },
+  { id: "e2", degree: "B.Sc. Software Engineering", institute: "MIT", year: "2015 – 2019", detail: "Graduated with Honors, GPA 3.9/4.0" },
+  { id: "e3", degree: "High School Diploma", institute: "Phillips Academy Andover", year: "2011 – 2015", detail: "Focus on Mathematics and Computer Science" },
 ];
 
-const EXPERIENCE = [
-  {
-    role: "Senior Full-Stack Developer",
-    company: "TechNova Inc.",
-    year: "2023 – Present",
-    detail: "Leading a team of 8 engineers building next-gen SaaS platform",
-  },
-  {
-    role: "Full-Stack Developer",
-    company: "CloudSync Labs",
-    year: "2021 – 2023",
-    detail: "Built real-time collaboration tools used by 50K+ users",
-  },
-  {
-    role: "Frontend Developer",
-    company: "PixelCraft Studio",
-    year: "2019 – 2021",
-    detail: "Designed and shipped 15+ client-facing web applications",
-  },
+const FALLBACK_EXPERIENCE = [
+  { id: "x1", role: "Senior Full-Stack Developer", company: "TechNova Inc.", year: "2023 – Present", detail: "Leading a team of 8 engineers building next-gen SaaS platform" },
+  { id: "x2", role: "Full-Stack Developer", company: "CloudSync Labs", year: "2021 – 2023", detail: "Built real-time collaboration tools used by 50K+ users" },
+  { id: "x3", role: "Frontend Developer", company: "PixelCraft Studio", year: "2019 – 2021", detail: "Designed and shipped 15+ client-facing web applications" },
 ];
 
-const SKILLS = [
-  "React", "Next.js", "TypeScript", "Node.js", "Python", "PostgreSQL",
-  "MongoDB", "Tailwind CSS", "Docker", "AWS", "GraphQL", "Redis",
-  "Figma", "Git", "CI/CD", "Prisma",
+const FALLBACK_SKILLS = [
+  { id: "s1", name: "React" }, { id: "s2", name: "Next.js" }, { id: "s3", name: "TypeScript" },
+  { id: "s4", name: "Node.js" }, { id: "s5", name: "Python" }, { id: "s6", name: "PostgreSQL" },
+  { id: "s7", name: "MongoDB" }, { id: "s8", name: "Tailwind CSS" }, { id: "s9", name: "Docker" },
+  { id: "s10", name: "AWS" }, { id: "s11", name: "GraphQL" }, { id: "s12", name: "Redis" },
+  { id: "s13", name: "Figma" }, { id: "s14", name: "Git" }, { id: "s15", name: "CI/CD" },
+  { id: "s16", name: "Prisma" },
 ];
 
-const GALLERY_IMAGES = [
-  { src: "https://picsum.photos/seed/portfolio1/400/300", alt: "Mountain landscape" },
-  { src: "https://picsum.photos/seed/portfolio2/400/300", alt: "City skyline" },
-  { src: "https://picsum.photos/seed/portfolio3/400/300", alt: "Ocean waves" },
-  { src: "https://picsum.photos/seed/portfolio4/400/300", alt: "Forest trail" },
+const FALLBACK_GALLERY_IMAGES = [
+  { id: "g1", src: "https://picsum.photos/seed/portfolio1/400/300", alt: "Mountain landscape", category: "landscape" },
+  { id: "g2", src: "https://picsum.photos/seed/portfolio2/400/300", alt: "City skyline", category: "urban" },
+  { id: "g3", src: "https://picsum.photos/seed/portfolio3/400/300", alt: "Ocean waves", category: "nature" },
+  { id: "g4", src: "https://picsum.photos/seed/portfolio4/400/300", alt: "Forest trail", category: "nature" },
 ];
 
-const GALLERY_NOTES = [
-  {
-    title: "On Building for Scale",
-    content: "The best architectures emerge not from upfront design, but from iterative refinement. Start simple, measure often, and refactor ruthlessly.",
-    date: "May 20, 2026",
-  },
-  {
-    title: "Design is How It Works",
-    content: "Beautiful interfaces that don't solve real problems are just decoration. Always start with the user's pain point and work backwards to the solution.",
-    date: "Apr 15, 2026",
-  },
-  {
-    title: "The Power of Boring Tech",
-    content: "Choose proven technologies for your stack. Innovation belongs in your product, not your infrastructure. Boring tech lets you move fast with confidence.",
-    date: "Mar 08, 2026",
-  },
+const FALLBACK_NOTES = [
+  { id: "n1", title: "On Building for Scale", content: "The best architectures emerge not from upfront design, but from iterative refinement. Start simple, measure often, and refactor ruthlessly.", date: "May 20, 2026" },
+  { id: "n2", title: "Design is How It Works", content: "Beautiful interfaces that don't solve real problems are just decoration. Always start with the user's pain point and work backwards to the solution.", date: "Apr 15, 2026" },
+  { id: "n3", title: "The Power of Boring Tech", content: "Choose proven technologies for your stack. Innovation belongs in your product, not your infrastructure. Boring tech lets you move fast with confidence.", date: "Mar 08, 2026" },
 ];
 
-const GALLERY_QUOTES = [
-  {
-    text: "Code is like humor. When you have to explain it, it's bad.",
-    context: "On writing clean code",
-  },
-  {
-    text: "First, solve the problem. Then, write the code.",
-    context: "On thinking before coding",
-  },
-  {
-    text: "Simplicity is the soul of efficiency.",
-    context: "On keeping things simple",
-  },
+const FALLBACK_QUOTES = [
+  { id: "q1", text: "Code is like humor. When you have to explain it, it's bad.", context: "On writing clean code" },
+  { id: "q2", text: "First, solve the problem. Then, write the code.", context: "On thinking before coding" },
+  { id: "q3", text: "Simplicity is the soul of efficiency.", context: "On keeping things simple" },
 ];
 
-const PROJECTS = [
-  {
-    name: "TaskFlow",
-    description: "AI-powered project management platform with real-time collaboration",
-    tags: ["Next.js", "OpenAI", "Socket.io"],
-    demo: "#",
-    github: "#",
-    image: "https://picsum.photos/seed/proj1/600/340",
-  },
-  {
-    name: "FinTrack",
-    description: "Personal finance dashboard with smart budgeting and analytics",
-    tags: ["React", "D3.js", "Node.js"],
-    demo: "#",
-    github: "#",
-    image: "https://picsum.photos/seed/proj2/600/340",
-  },
-  {
-    name: "DevChat",
-    description: "Real-time messaging app for developer teams with code snippets",
-    tags: ["TypeScript", "WebSocket", "Redis"],
-    demo: "#",
-    github: "#",
-    image: "https://picsum.photos/seed/proj3/600/340",
-  },
-  {
-    name: "EcoMarket",
-    description: "Sustainable e-commerce platform with carbon footprint tracking",
-    tags: ["Next.js", "Stripe", "Prisma"],
-    demo: "#",
-    github: "#",
-    image: "https://picsum.photos/seed/proj4/600/340",
-  },
+const FALLBACK_PROJECTS = [
+  { id: "p1", name: "TaskFlow", description: "AI-powered project management platform with real-time collaboration", tags: "Next.js,OpenAI,Socket.io", demoUrl: "#", githubUrl: "#", image: "https://picsum.photos/seed/proj1/600/340", featuredImage: "", featured: true, category: "" },
+  { id: "p2", name: "FinTrack", description: "Personal finance dashboard with smart budgeting and analytics", tags: "React,D3.js,Node.js", demoUrl: "#", githubUrl: "#", image: "https://picsum.photos/seed/proj2/600/340", featuredImage: "", featured: true, category: "" },
+  { id: "p3", name: "DevChat", description: "Real-time messaging app for developer teams with code snippets", tags: "TypeScript,WebSocket,Redis", demoUrl: "#", githubUrl: "#", image: "https://picsum.photos/seed/proj3/600/340", featuredImage: "", featured: true, category: "" },
+  { id: "p4", name: "EcoMarket", description: "Sustainable e-commerce platform with carbon footprint tracking", tags: "Next.js,Stripe,Prisma", demoUrl: "#", githubUrl: "#", image: "https://picsum.photos/seed/proj4/600/340", featuredImage: "", featured: true, category: "" },
 ];
 
-const BLOG_POSTS = [
-  {
-    title: "Building Scalable APIs with Next.js Server Actions",
-    date: "May 15, 2026",
-    excerpt: "A deep dive into leveraging server actions for type-safe, performant API design.",
-    link: "#",
-    image: "https://picsum.photos/seed/blog1/600/340",
-  },
-  {
-    title: "The Future of CSS: What's Coming in 2027",
-    date: "Apr 28, 2026",
-    excerpt: "Exploring upcoming CSS features that will transform how we build interfaces.",
-    link: "#",
-    image: "https://picsum.photos/seed/blog2/600/340",
-  },
-  {
-    title: "Why I Switched from Redux to Zustand",
-    date: "Apr 10, 2026",
-    excerpt: "My journey simplifying state management with a lighter, more intuitive library.",
-    link: "#",
-    image: "https://picsum.photos/seed/blog3/600/340",
-  },
+const FALLBACK_BLOG_POSTS = [
+  { id: "b1", title: "Building Scalable APIs with Next.js Server Actions", date: "May 15, 2026", excerpt: "A deep dive into leveraging server actions for type-safe, performant API design.", image: "https://picsum.photos/seed/blog1/600/340", featuredImage: "", tags: "", category: "" },
+  { id: "b2", title: "The Future of CSS: What's Coming in 2027", date: "Apr 28, 2026", excerpt: "Exploring upcoming CSS features that will transform how we build interfaces.", image: "https://picsum.photos/seed/blog2/600/340", featuredImage: "", tags: "", category: "" },
+  { id: "b3", title: "Why I Switched from Redux to Zustand", date: "Apr 10, 2026", excerpt: "My journey simplifying state management with a lighter, more intuitive library.", image: "https://picsum.photos/seed/blog3/600/340", featuredImage: "", tags: "", category: "" },
 ];
 
-const STORE_ITEMS = [
-  {
-    name: "UI Component Kit",
-    price: "$29",
-    image: "https://picsum.photos/seed/store1/300/200",
-  },
-  {
-    name: "React Hooks Handbook",
-    price: "$19",
-    image: "https://picsum.photos/seed/store2/300/200",
-  },
-  {
-    name: "Design System Template",
-    price: "$39",
-    image: "https://picsum.photos/seed/store3/300/200",
-  },
+const FALLBACK_STORE_ITEMS = [
+  { id: "st1", name: "UI Component Kit", price: "$29", image: "https://picsum.photos/seed/store1/300/200", featuredImage: "", description: "", category: "", rating: 4.8 },
+  { id: "st2", name: "React Hooks Handbook", price: "$19", image: "https://picsum.photos/seed/store2/300/200", featuredImage: "", description: "", category: "", rating: 4.5 },
+  { id: "st3", name: "Design System Template", price: "$39", image: "https://picsum.photos/seed/store3/300/200", featuredImage: "", description: "", category: "", rating: 4.9 },
+];
+
+const FALLBACK_PROFILE = {
+  id: "pr1",
+  name: "Alex Morgan",
+  tagline: "Full-Stack Developer & Designer — crafting elegant digital experiences with modern web technologies.",
+  avatar: "https://picsum.photos/seed/avatar42/300/300",
+  about: "I'm a passionate full-stack developer with 7+ years of experience building high-performance web applications. I specialize in React, Next.js, and Node.js ecosystems, with a keen eye for pixel-perfect UI and scalable architecture. I thrive at the intersection of design and engineering — translating complex requirements into intuitive, accessible products. When I'm not coding, you'll find me exploring open-source projects, writing technical blog posts, or sketching UI concepts in Figma.",
+  email: "alex@example.com",
+  phone: "",
+  location: "",
+  website: "",
+  resume: "",
+};
+
+const FALLBACK_SOCIAL_LINKS = [
+  { id: "sl1", platform: "GitHub", url: "#", icon: "github", handle: "" },
+  { id: "sl2", platform: "LinkedIn", url: "#", icon: "linkedin", handle: "" },
+  { id: "sl3", platform: "Twitter", url: "#", icon: "twitter", handle: "" },
+  { id: "sl4", platform: "Instagram", url: "#", icon: "instagram", handle: "" },
+  { id: "sl5", platform: "YouTube", url: "#", icon: "youtube", handle: "" },
+  { id: "sl6", platform: "Facebook", url: "#", icon: "facebook", handle: "" },
+  { id: "sl7", platform: "Dribbble", url: "#", icon: "dribbble", handle: "" },
 ];
 
 /* ─── Gallery Tabs ─── */
@@ -223,6 +141,29 @@ const GALLERY_TABS: { key: GalleryTab; label: string; icon: React.ElementType }[
   { key: "notes", label: "Notes", icon: StickyNote },
   { key: "quotes", label: "Quotes", icon: Quote },
 ];
+
+/* ─── Social icon mapper ─── */
+const ICON_MAP: Record<string, React.ElementType> = {
+  github: Github,
+  linkedin: Linkedin,
+  twitter: Twitter,
+  instagram: Instagram,
+  youtube: Youtube,
+  facebook: Facebook,
+  dribbble: Dribbble,
+  x: Twitter,
+};
+
+/* ─── Helper: split comma-separated tags ─── */
+function splitTags(tags: string | null | undefined): string[] {
+  if (!tags) return [];
+  return tags.split(",").map((t) => t.trim()).filter(Boolean);
+}
+
+/* ─── Helper: resolve image with featuredImage fallback ─── */
+function resolveImage(item: { featuredImage?: string | null; image?: string | null }): string {
+  return item.featuredImage || item.image || "";
+}
 
 /* ──────────────────── Fade-in Wrapper ──────────────────── */
 
@@ -300,11 +241,56 @@ export default function PortfolioPage() {
   const { theme, setTheme } = useTheme();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [showTop, setShowTop] = useState(false);
-  const [lightbox, setLightbox] = useState<string | null>(null);
+  const [lightbox, setLightbox] = useState<number | null>(null);
   const [mounted, setMounted] = useState(false);
   const [galleryTab, setGalleryTab] = useState<GalleryTab>("images");
 
+  /* ─── API data state ─── */
+  const [profile, setProfile] = useState(FALLBACK_PROFILE);
+  const [education, setEducation] = useState(FALLBACK_EDUCATION);
+  const [experience, setExperience] = useState(FALLBACK_EXPERIENCE);
+  const [skills, setSkills] = useState(FALLBACK_SKILLS);
+  const [galleryImages, setGalleryImages] = useState(FALLBACK_GALLERY_IMAGES);
+  const [notes, setNotes] = useState(FALLBACK_NOTES);
+  const [quotes, setQuotes] = useState(FALLBACK_QUOTES);
+  const [projects, setProjects] = useState(FALLBACK_PROJECTS);
+  const [blogPosts, setBlogPosts] = useState(FALLBACK_BLOG_POSTS);
+  const [storeProducts, setStoreProducts] = useState(FALLBACK_STORE_ITEMS);
+  const [socialLinks, setSocialLinks] = useState(FALLBACK_SOCIAL_LINKS);
+
+  /* ─── Derived: top 4 gallery images for homepage ─── */
+  const homepageGalleryImages = galleryImages.slice(0, 4);
+
+  /* ─── Derived: top 4 projects for homepage ─── */
+  const homepageProjects = projects.slice(0, 4);
+
   const mountedRef = useRef(false);
+
+  /* ─── Fetch API data on mount ─── */
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const res = await fetch("/api/data");
+        if (!res.ok) return;
+        const data = await res.json();
+
+        if (data.profile) setProfile(data.profile);
+        if (data.education?.length) setEducation(data.education);
+        if (data.experience?.length) setExperience(data.experience);
+        if (data.skills?.length) setSkills(data.skills);
+        if (data.galleryImages?.length) setGalleryImages(data.galleryImages);
+        if (data.notes?.length) setNotes(data.notes);
+        if (data.quotes?.length) setQuotes(data.quotes);
+        if (data.projects?.length) setProjects(data.projects);
+        if (data.blogPosts?.length) setBlogPosts(data.blogPosts);
+        if (data.storeProducts?.length) setStoreProducts(data.storeProducts);
+        if (data.socialLinks?.length) setSocialLinks(data.socialLinks);
+      } catch {
+        // Keep fallback data on error
+      }
+    }
+    fetchData();
+  }, []);
 
   useEffect(() => {
     if (!mountedRef.current) {
@@ -327,8 +313,69 @@ export default function PortfolioPage() {
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
+  /* ─── Lightbox keyboard navigation ─── */
+  useEffect(() => {
+    if (lightbox === null) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setLightbox(null);
+      } else if (e.key === "ArrowRight") {
+        setLightbox((prev) =>
+          prev !== null ? (prev + 1) % homepageGalleryImages.length : null
+        );
+      } else if (e.key === "ArrowLeft") {
+        setLightbox((prev) =>
+          prev !== null
+            ? (prev - 1 + homepageGalleryImages.length) % homepageGalleryImages.length
+            : null
+        );
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [lightbox, homepageGalleryImages.length]);
+
+  /* ─── Lightbox touch swipe ─── */
+  const touchStartRef = useRef<number | null>(null);
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    touchStartRef.current = e.touches[0].clientX;
+  }, []);
+
+  const handleTouchEnd = useCallback(
+    (e: React.TouchEvent) => {
+      if (touchStartRef.current === null) return;
+      const diff = e.changedTouches[0].clientX - touchStartRef.current;
+      const threshold = 50;
+
+      if (Math.abs(diff) > threshold) {
+        if (diff < 0) {
+          // Swipe left → next
+          setLightbox((prev) =>
+            prev !== null ? (prev + 1) % homepageGalleryImages.length : null
+          );
+        } else {
+          // Swipe right → previous
+          setLightbox((prev) =>
+            prev !== null
+              ? (prev - 1 + homepageGalleryImages.length) % homepageGalleryImages.length
+              : null
+          );
+        }
+      }
+      touchStartRef.current = null;
+    },
+    [homepageGalleryImages.length]
+  );
+
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
   const toggleTheme = () => setTheme(theme === "dark" ? "light" : "dark");
+
+  /* ─── Derived: social links split into two rows ─── */
+  const socialRow1 = socialLinks.slice(0, 4);
+  const socialRow2 = socialLinks.slice(4, 7);
 
   return (
     <div className="dot-pattern min-h-screen flex flex-col">
@@ -336,7 +383,7 @@ export default function PortfolioPage() {
       <header className="sticky top-0 z-50 backdrop-blur-md bg-background/80 border-b border-border">
         <nav className="max-w-6xl mx-auto flex items-center justify-between h-14 px-4">
           <a href="#" className="text-lg font-bold text-foreground tracking-tight">
-            <span className="text-emerald">A</span>lex<span className="text-emerald">.</span>
+            <span className="text-emerald">{profile.name?.charAt(0) || "A"}</span>{profile.name?.slice(1).split(" ")[0] || "lex"}<span className="text-emerald">.</span>
           </a>
           <ul className="hidden md:flex items-center gap-1">
             {NAV_LINKS.map((l) => (
@@ -400,23 +447,30 @@ export default function PortfolioPage() {
             <div className="flex flex-col md:flex-row items-center gap-6">
               <div className="flex-1 text-center md:text-left">
                 <h1 className="text-3xl md:text-4xl font-bold text-foreground leading-tight">
-                  Hi, I&apos;m <span className="text-emerald">Alex Morgan</span>
+                  Hi, I&apos;m <span className="text-emerald">{profile.name}</span>
                 </h1>
                 <p className="mt-2 text-muted-foreground text-sm md:text-base">
-                  Full-Stack Developer &amp; Designer — crafting elegant digital experiences with modern web technologies.
+                  {profile.tagline}
                 </p>
                 <div className="mt-4 flex flex-wrap gap-3 justify-center md:justify-start">
                   <a href="#contact" className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald text-white text-sm font-semibold hover:bg-emerald-hover transition-colors shadow-sm">
                     <Mail className="w-4 h-4" /> Contact Me
                   </a>
-                  <a href="#" className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-emerald text-emerald text-sm font-semibold hover:bg-emerald/5 transition-colors">
-                    <Download className="w-4 h-4" /> Download CV
-                  </a>
+                  {profile.resume && (
+                    <a href={profile.resume} className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-emerald text-emerald text-sm font-semibold hover:bg-emerald/5 transition-colors">
+                      <Download className="w-4 h-4" /> Download CV
+                    </a>
+                  )}
+                  {!profile.resume && (
+                    <a href="#" className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-emerald text-emerald text-sm font-semibold hover:bg-emerald/5 transition-colors">
+                      <Download className="w-4 h-4" /> Download CV
+                    </a>
+                  )}
                 </div>
               </div>
               <div className="shrink-0">
                 <div className="w-28 h-28 md:w-36 md:h-36 rounded-full border-2 border-emerald/30 overflow-hidden shadow-md">
-                  <img src="https://picsum.photos/seed/avatar42/300/300" alt="Alex Morgan profile photo" className="w-full h-full object-cover" />
+                  <img src={profile.avatar || "https://picsum.photos/seed/avatar42/300/300"} alt={`${profile.name} profile photo`} className="w-full h-full object-cover" />
                 </div>
               </div>
             </div>
@@ -428,10 +482,7 @@ export default function PortfolioPage() {
           <CardShell className="p-6" id="about">
             <SectionHeading icon={User} title="About Me" />
             <p className="text-sm leading-relaxed text-muted-foreground">
-              I&apos;m a passionate full-stack developer with 7+ years of experience building high-performance web applications.
-              I specialize in React, Next.js, and Node.js ecosystems, with a keen eye for pixel-perfect UI and scalable architecture.
-              I thrive at the intersection of design and engineering — translating complex requirements into intuitive, accessible products.
-              When I&apos;m not coding, you&apos;ll find me exploring open-source projects, writing technical blog posts, or sketching UI concepts in Figma.
+              {profile.about}
             </p>
           </CardShell>
         </FadeIn>
@@ -441,8 +492,8 @@ export default function PortfolioPage() {
           <CardShell className="p-6" id="education">
             <SectionHeading icon={GraduationCap} title="Education" />
             <div className="relative pl-6 border-l-2 border-emerald/30 space-y-5">
-              {EDUCATION.map((e, i) => (
-                <div key={i} className="relative">
+              {education.map((e) => (
+                <div key={e.id} className="relative">
                   <span className="absolute -left-[1.55rem] top-1 w-3 h-3 rounded-full bg-emerald border-2 border-background" />
                   <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1">
                     <div>
@@ -451,7 +502,7 @@ export default function PortfolioPage() {
                     </div>
                     <span className="text-xs font-medium text-emerald whitespace-nowrap">{e.year}</span>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-0.5">{e.detail}</p>
+                  {e.detail && <p className="text-xs text-muted-foreground mt-0.5">{e.detail}</p>}
                 </div>
               ))}
             </div>
@@ -463,8 +514,8 @@ export default function PortfolioPage() {
           <CardShell className="p-6" id="experience">
             <SectionHeading icon={Briefcase} title="Experience" />
             <div className="relative pl-6 border-l-2 border-emerald/30 space-y-5">
-              {EXPERIENCE.map((e, i) => (
-                <div key={i} className="relative">
+              {experience.map((e) => (
+                <div key={e.id} className="relative">
                   <span className="absolute -left-[1.55rem] top-1 w-3 h-3 rounded-full bg-emerald border-2 border-background" />
                   <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1">
                     <div>
@@ -473,14 +524,14 @@ export default function PortfolioPage() {
                     </div>
                     <span className="text-xs font-medium text-emerald whitespace-nowrap">{e.year}</span>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-0.5">{e.detail}</p>
+                  {e.detail && <p className="text-xs text-muted-foreground mt-0.5">{e.detail}</p>}
                 </div>
               ))}
             </div>
           </CardShell>
         </FadeIn>
 
-        {/* ─── Gallery (moved before Skills) ─── */}
+        {/* ─── Gallery (before Skills) ─── */}
         <FadeIn>
           <CardShell className="p-6" id="gallery">
             <SectionHeading icon={ImageIcon} title="Gallery" viewAllHref="/gallery" />
@@ -514,10 +565,10 @@ export default function PortfolioPage() {
                   transition={{ duration: 0.2 }}
                 >
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                    {GALLERY_IMAGES.map((img, i) => (
+                    {homepageGalleryImages.map((img, i) => (
                       <button
-                        key={i}
-                        onClick={() => setLightbox(img.src)}
+                        key={img.id}
+                        onClick={() => setLightbox(i)}
                         className="group relative aspect-[4/3] overflow-hidden rounded-xl border border-border hover:border-emerald transition-colors cursor-pointer"
                       >
                         <img src={img.src} alt={img.alt} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" loading="lazy" />
@@ -537,8 +588,8 @@ export default function PortfolioPage() {
                   transition={{ duration: 0.2 }}
                   className="space-y-3"
                 >
-                  {GALLERY_NOTES.map((note, i) => (
-                    <div key={i} className="p-4 rounded-xl border border-border hover:border-emerald transition-colors bg-muted/30">
+                  {notes.map((note) => (
+                    <div key={note.id} className="p-4 rounded-xl border border-border hover:border-emerald transition-colors bg-muted/30">
                       <div className="flex items-start gap-3">
                         <div className="w-8 h-8 rounded-lg bg-emerald/10 flex items-center justify-center shrink-0 mt-0.5">
                           <StickyNote className="w-4 h-4 text-emerald" />
@@ -546,7 +597,7 @@ export default function PortfolioPage() {
                         <div className="flex-1 min-w-0">
                           <h4 className="text-sm font-semibold text-foreground">{note.title}</h4>
                           <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{note.content}</p>
-                          <span className="text-[10px] text-muted-foreground mt-2 block">{note.date}</span>
+                          {note.date && <span className="text-[10px] text-muted-foreground mt-2 block">{note.date}</span>}
                         </div>
                       </div>
                     </div>
@@ -563,15 +614,15 @@ export default function PortfolioPage() {
                   transition={{ duration: 0.2 }}
                   className="space-y-3"
                 >
-                  {GALLERY_QUOTES.map((q, i) => (
-                    <div key={i} className="p-4 rounded-xl border border-border hover:border-emerald transition-colors bg-muted/30">
+                  {quotes.map((q) => (
+                    <div key={q.id} className="p-4 rounded-xl border border-border hover:border-emerald transition-colors bg-muted/30">
                       <div className="flex items-start gap-3">
                         <div className="w-8 h-8 rounded-lg bg-emerald/10 flex items-center justify-center shrink-0 mt-0.5">
                           <Quote className="w-4 h-4 text-emerald" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm text-foreground italic leading-relaxed">&ldquo;{q.text}&rdquo;</p>
-                          <span className="text-[10px] text-emerald font-medium mt-2 block">&mdash; {q.context}</span>
+                          {q.context && <span className="text-[10px] text-emerald font-medium mt-2 block">&mdash; {q.context}</span>}
                         </div>
                       </div>
                     </div>
@@ -582,25 +633,31 @@ export default function PortfolioPage() {
           </CardShell>
         </FadeIn>
 
-        {/* Lightbox */}
+        {/* ─── Lightbox with swipe navigation ─── */}
         <AnimatePresence>
-          {lightbox && (
+          {lightbox !== null && homepageGalleryImages[lightbox] && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-4"
               onClick={() => setLightbox(null)}
+              onTouchStart={handleTouchStart}
+              onTouchEnd={handleTouchEnd}
             >
               <motion.img
-                initial={{ scale: 0.9 }}
-                animate={{ scale: 1 }}
-                exit={{ scale: 0.9 }}
-                src={lightbox}
-                alt="Gallery preview"
+                key={lightbox}
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.9, opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                src={homepageGalleryImages[lightbox].src}
+                alt={homepageGalleryImages[lightbox].alt}
                 className="max-w-full max-h-[85vh] rounded-2xl object-contain"
                 onClick={(e) => e.stopPropagation()}
               />
+
+              {/* Close button */}
               <button
                 onClick={() => setLightbox(null)}
                 className="absolute top-6 right-6 w-10 h-10 rounded-full bg-white/10 backdrop-blur flex items-center justify-center text-white hover:bg-white/20 transition-colors"
@@ -608,6 +665,47 @@ export default function PortfolioPage() {
               >
                 <X className="w-5 h-5" />
               </button>
+
+              {/* Left arrow */}
+              {homepageGalleryImages.length > 1 && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setLightbox((prev) =>
+                      prev !== null
+                        ? (prev - 1 + homepageGalleryImages.length) % homepageGalleryImages.length
+                        : null
+                    );
+                  }}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 backdrop-blur flex items-center justify-center text-white hover:bg-white/20 transition-colors"
+                  aria-label="Previous image"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+              )}
+
+              {/* Right arrow */}
+              {homepageGalleryImages.length > 1 && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setLightbox((prev) =>
+                      prev !== null ? (prev + 1) % homepageGalleryImages.length : null
+                    );
+                  }}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 backdrop-blur flex items-center justify-center text-white hover:bg-white/20 transition-colors"
+                  aria-label="Next image"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+              )}
+
+              {/* Image index indicator */}
+              {homepageGalleryImages.length > 1 && (
+                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-white/10 backdrop-blur text-white text-xs font-medium">
+                  {lightbox + 1} / {homepageGalleryImages.length}
+                </div>
+              )}
             </motion.div>
           )}
         </AnimatePresence>
@@ -617,12 +715,12 @@ export default function PortfolioPage() {
           <CardShell className="p-6" id="skills">
             <SectionHeading icon={Code2} title="Skills" />
             <div className="flex flex-wrap gap-2">
-              {SKILLS.map((s, i) => (
+              {skills.map((s) => (
                 <span
-                  key={i}
+                  key={s.id}
                   className="px-3 py-1.5 text-xs font-medium text-foreground border border-border rounded-lg hover:border-emerald hover:text-emerald transition-colors cursor-default"
                 >
-                  {s}
+                  {s.name}
                 </span>
               ))}
             </div>
@@ -634,27 +732,31 @@ export default function PortfolioPage() {
           <div id="projects">
             <SectionHeading icon={Star} title="Projects" viewAllHref="/projects" />
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {PROJECTS.map((p, i) => (
-                <FadeIn key={i} delay={i * 0.08}>
+              {homepageProjects.map((p, i) => (
+                <FadeIn key={p.id} delay={i * 0.08}>
                   <CardShell className="overflow-hidden h-full flex flex-col">
                     <div className="aspect-[16/9] overflow-hidden">
-                      <img src={p.image} alt={p.name} className="w-full h-full object-cover transition-transform duration-300 hover:scale-105" loading="lazy" />
+                      <img src={resolveImage(p)} alt={p.name} className="w-full h-full object-cover transition-transform duration-300 hover:scale-105" loading="lazy" />
                     </div>
                     <div className="p-5 flex flex-col flex-1">
                       <h3 className="text-sm font-semibold text-foreground">{p.name}</h3>
                       <p className="text-xs text-muted-foreground mt-1 flex-1">{p.description}</p>
                       <div className="flex flex-wrap gap-1.5 mt-3">
-                        {p.tags.map((t) => (
+                        {splitTags(p.tags).map((t) => (
                           <span key={t} className="px-2 py-0.5 text-[10px] font-medium text-emerald bg-emerald/10 rounded-md">{t}</span>
                         ))}
                       </div>
                       <div className="flex gap-3 mt-3">
-                        <a href={p.demo} className="inline-flex items-center gap-1 text-xs font-medium text-emerald hover:underline">
-                          <ExternalLink className="w-3 h-3" /> Live Demo
-                        </a>
-                        <a href={p.github} className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-emerald transition-colors">
-                          <Github className="w-3 h-3" /> GitHub
-                        </a>
+                        {p.demoUrl && (
+                          <a href={p.demoUrl} className="inline-flex items-center gap-1 text-xs font-medium text-emerald hover:underline">
+                            <ExternalLink className="w-3 h-3" /> Live Demo
+                          </a>
+                        )}
+                        {p.githubUrl && (
+                          <a href={p.githubUrl} className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-emerald transition-colors">
+                            <Github className="w-3 h-3" /> GitHub
+                          </a>
+                        )}
                       </div>
                     </div>
                   </CardShell>
@@ -669,11 +771,11 @@ export default function PortfolioPage() {
           <div id="blog">
             <SectionHeading icon={FileText} title="Blog" viewAllHref="/blog" />
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              {BLOG_POSTS.map((post, i) => (
-                <FadeIn key={i} delay={i * 0.08}>
+              {blogPosts.map((post, i) => (
+                <FadeIn key={post.id} delay={i * 0.08}>
                   <CardShell className="overflow-hidden h-full flex flex-col">
                     <div className="aspect-[16/9] overflow-hidden">
-                      <img src={post.image} alt={post.title} className="w-full h-full object-cover" loading="lazy" />
+                      <img src={resolveImage(post)} alt={post.title} className="w-full h-full object-cover" loading="lazy" />
                     </div>
                     <div className="p-5 flex flex-col flex-1">
                       <h3 className="text-sm font-semibold text-foreground leading-snug">{post.title}</h3>
@@ -682,7 +784,7 @@ export default function PortfolioPage() {
                         <span className="text-[10px] text-muted-foreground">{post.date}</span>
                       </div>
                       <p className="text-xs text-muted-foreground mt-2 flex-1">{post.excerpt}</p>
-                      <a href={post.link} className="inline-flex items-center gap-1 text-xs font-medium text-emerald mt-3 hover:underline">
+                      <a href="#" className="inline-flex items-center gap-1 text-xs font-medium text-emerald mt-3 hover:underline">
                         Read More <ChevronRight className="w-3 h-3" />
                       </a>
                     </div>
@@ -698,11 +800,11 @@ export default function PortfolioPage() {
           <div id="store">
             <SectionHeading icon={ShoppingCart} title="Store" viewAllHref="/store" />
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              {STORE_ITEMS.map((item, i) => (
-                <FadeIn key={i} delay={i * 0.08}>
+              {storeProducts.map((item, i) => (
+                <FadeIn key={item.id} delay={i * 0.08}>
                   <CardShell className="overflow-hidden">
                     <div className="aspect-[3/2] overflow-hidden">
-                      <img src={item.image} alt={item.name} className="w-full h-full object-cover" loading="lazy" />
+                      <img src={resolveImage(item)} alt={item.name} className="w-full h-full object-cover" loading="lazy" />
                     </div>
                     <div className="p-4 flex items-center justify-between">
                       <div>
@@ -721,39 +823,38 @@ export default function PortfolioPage() {
         </FadeIn>
 
         {/* ─── Social Media Card ─── */}
-        <FadeIn id="socials">
+        <FadeIn>
           <CardShell className="p-6" id="socials">
             <SectionHeading icon={User} title="Connect With Me" />
             <div className="space-y-3">
               <div className="flex justify-center gap-3">
-                {[
-                  { icon: Github, href: "#", label: "GitHub" },
-                  { icon: Linkedin, href: "#", label: "LinkedIn" },
-                  { icon: Twitter, href: "#", label: "Twitter / X" },
-                  { icon: Instagram, href: "#", label: "Instagram" },
-                ].map(({ icon: Icon, href, label }) => (
-                  <a key={label} href={href} aria-label={label} className="w-12 h-12 rounded-xl border border-border flex items-center justify-center text-muted-foreground hover:border-emerald hover:text-emerald hover:bg-emerald/5 transition-colors">
-                    <Icon className="w-5 h-5" />
-                  </a>
-                ))}
+                {socialRow1.map(({ id, platform, url, icon }) => {
+                  const Icon = ICON_MAP[icon?.toLowerCase()] || ExternalLink;
+                  return (
+                    <a key={id} href={url} aria-label={platform} className="w-12 h-12 rounded-xl border border-border flex items-center justify-center text-muted-foreground hover:border-emerald hover:text-emerald hover:bg-emerald/5 transition-colors">
+                      <Icon className="w-5 h-5" />
+                    </a>
+                  );
+                })}
               </div>
-              <div className="flex justify-center gap-3">
-                {[
-                  { icon: Youtube, href: "#", label: "YouTube" },
-                  { icon: Facebook, href: "#", label: "Facebook" },
-                  { icon: Dribbble, href: "#", label: "Dribbble" },
-                ].map(({ icon: Icon, href, label }) => (
-                  <a key={label} href={href} aria-label={label} className="w-12 h-12 rounded-xl border border-border flex items-center justify-center text-muted-foreground hover:border-emerald hover:text-emerald hover:bg-emerald/5 transition-colors">
-                    <Icon className="w-5 h-5" />
-                  </a>
-                ))}
-              </div>
+              {socialRow2.length > 0 && (
+                <div className="flex justify-center gap-3">
+                  {socialRow2.map(({ id, platform, url, icon }) => {
+                    const Icon = ICON_MAP[icon?.toLowerCase()] || ExternalLink;
+                    return (
+                      <a key={id} href={url} aria-label={platform} className="w-12 h-12 rounded-xl border border-border flex items-center justify-center text-muted-foreground hover:border-emerald hover:text-emerald hover:bg-emerald/5 transition-colors">
+                        <Icon className="w-5 h-5" />
+                      </a>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           </CardShell>
         </FadeIn>
 
         {/* ─── Contact CTA Card ─── */}
-        <FadeIn id="contact">
+        <FadeIn>
           <Link href="/contact" id="contact">
             <CardShell className="p-6 cursor-pointer group">
               <div className="flex items-center gap-4">
@@ -776,17 +877,16 @@ export default function PortfolioPage() {
       {/* ─── Footer ─── */}
       <footer className="border-t border-border mt-6">
         <div className="max-w-6xl mx-auto px-4 py-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} Alex Morgan. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} {profile.name}. All rights reserved.</p>
           <div className="flex gap-3">
-            {[
-              { icon: Github, href: "#", label: "GitHub" },
-              { icon: Linkedin, href: "#", label: "LinkedIn" },
-              { icon: Twitter, href: "#", label: "Twitter" },
-            ].map(({ icon: Icon, href, label }) => (
-              <a key={label} href={href} aria-label={label} className="hover:text-emerald transition-colors">
-                <Icon className="w-4 h-4" />
-              </a>
-            ))}
+            {socialLinks.slice(0, 3).map(({ id, platform, url, icon }) => {
+              const Icon = ICON_MAP[icon?.toLowerCase()] || ExternalLink;
+              return (
+                <a key={id} href={url} aria-label={platform} className="hover:text-emerald transition-colors">
+                  <Icon className="w-4 h-4" />
+                </a>
+              );
+            })}
           </div>
         </div>
       </footer>

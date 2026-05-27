@@ -31,6 +31,11 @@ export async function GET(req: NextRequest) {
     storeProducts,
     messages,
     socialLinks,
+    audio,
+    video,
+    code,
+    links,
+    guestbookEntries,
   ] = await Promise.all([
     db.profile.findFirst(),
     db.education.findMany({ orderBy: { order: "asc" } }),
@@ -44,6 +49,11 @@ export async function GET(req: NextRequest) {
     db.storeProduct.findMany({ orderBy: { order: "asc" } }),
     db.message.findMany({ orderBy: { createdAt: "desc" } }),
     db.socialLink.findMany({ orderBy: { order: "asc" } }),
+    db.audio.findMany({ orderBy: { order: "asc" } }),
+    db.video.findMany({ orderBy: { order: "asc" } }),
+    db.code.findMany({ orderBy: { order: "asc" } }),
+    db.link.findMany({ orderBy: { order: "asc" } }),
+    db.guestbookEntry.findMany({ orderBy: { createdAt: "desc" } }),
   ]);
 
   return NextResponse.json({
@@ -59,5 +69,10 @@ export async function GET(req: NextRequest) {
     storeProducts,
     messages,
     socialLinks,
+    audio,
+    video,
+    code,
+    links,
+    guestbookEntries,
   });
 }

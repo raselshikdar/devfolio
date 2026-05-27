@@ -10,7 +10,16 @@ function verifyAuth(req: NextRequest): boolean {
 export async function POST(req: NextRequest) {
   if (!verifyAuth(req)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const data = await req.json();
-  const item = await db.skill.create({ data: { name: data.name, order: data.order || 0 } });
+  const item = await db.skill.create({ data: { name: data.name, hidden: data.hidden || false, order: data.order || 0 } });
+  return NextResponse.json(item);
+}
+
+export async function PUT(req: NextRequest) {
+  if (!verifyAuth(req)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const data = await req.json();
+  const { id, ...updateData } = data;
+  if (!id) return NextResponse.json({ error: "ID required" }, { status: 400 });
+  const item = await db.skill.update({ where: { id }, data: updateData });
   return NextResponse.json(item);
 }
 

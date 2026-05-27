@@ -10,7 +10,7 @@ function verifyAuth(req: NextRequest): boolean {
 export async function POST(req: NextRequest) {
   if (!verifyAuth(req)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const data = await req.json();
-  const item = await db.blogPost.create({ data: { title: data.title, date: data.date || "", excerpt: data.excerpt || null, content: data.content || null, image: data.image || null, tags: data.tags || null, published: data.published || false, order: data.order || 0 } });
+  const item = await db.blogPost.create({ data: { title: data.title, date: data.date || "", excerpt: data.excerpt || null, content: data.content || null, image: data.image || null, featuredImage: data.featuredImage || null, tags: data.tags || null, category: data.category || null, published: data.published || false, hidden: data.hidden || false, order: data.order || 0 } });
   return NextResponse.json(item);
 }
 

@@ -27,6 +27,7 @@ model Profile {
   location  String?
   website   String?
   resume    String?
+  hidden    Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -38,6 +39,7 @@ model Education {
   year      String
   detail    String?
   order     Int      @default(0)
+  hidden    Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -49,6 +51,7 @@ model Experience {
   year      String
   detail    String?
   order     Int      @default(0)
+  hidden    Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -57,6 +60,7 @@ model Skill {
   id        String   @id @default(cuid())
   name      String
   order     Int      @default(0)
+  hidden    Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -66,10 +70,13 @@ model Project {
   name        String
   description String
   image       String?
+  featuredImage String?
   demoUrl     String?
   githubUrl   String?
   tags        String?
+  category    String?
   featured    Boolean  @default(false)
+  hidden      Boolean  @default(false)
   order       Int      @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -80,6 +87,7 @@ model GalleryImage {
   src       String
   alt       String
   category  String?
+  hidden    Boolean  @default(false)
   order     Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -90,6 +98,7 @@ model Note {
   title     String
   content   String
   date      String?
+  hidden    Boolean  @default(false)
   order     Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -99,36 +108,42 @@ model Quote {
   id        String   @id @default(cuid())
   text      String
   context   String?
+  hidden    Boolean  @default(false)
   order     Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model BlogPost {
-  id          String   @id @default(cuid())
-  title       String
-  date        String
-  excerpt     String?
-  content     String?
-  image       String?
-  tags        String?
-  published   Boolean  @default(false)
-  order       Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id            String   @id @default(cuid())
+  title         String
+  date          String
+  excerpt       String?
+  content       String?
+  image         String?
+  featuredImage String?
+  tags          String?
+  category      String?
+  published     Boolean  @default(false)
+  hidden        Boolean  @default(false)
+  order         Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 model StoreProduct {
-  id          String   @id @default(cuid())
-  name        String
-  price       String
-  image       String?
-  description String?
-  category    String?
-  rating      Float?
-  order       Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id            String   @id @default(cuid())
+  name          String
+  price         String
+  image         String?
+  featuredImage String?
+  description   String?
+  category      String?
+  rating        Float?
+  hidden        Boolean  @default(false)
+  order         Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 model Message {
@@ -138,6 +153,7 @@ model Message {
   subject   String?
   message   String
   read      Boolean  @default(false)
+  hidden    Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -148,7 +164,68 @@ model SocialLink {
   url       String
   icon      String
   handle    String?
+  hidden    Boolean  @default(false)
   order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Audio {
+  id          String   @id @default(cuid())
+  title       String
+  url         String
+  description String?
+  category    String?
+  hidden      Boolean  @default(false)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Video {
+  id          String   @id @default(cuid())
+  title       String
+  url         String
+  description String?
+  category    String?
+  hidden      Boolean  @default(false)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Code {
+  id          String   @id @default(cuid())
+  title       String
+  content     String
+  language    String?
+  description String?
+  hidden      Boolean  @default(false)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Link {
+  id          String   @id @default(cuid())
+  title       String
+  url         String
+  description String?
+  category    String?
+  hidden      Boolean  @default(false)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model GuestbookEntry {
+  id        String   @id @default(cuid())
+  name      String
+  location  String
+  email     String?
+  phone     String?
+  message   String?
+  hidden    Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

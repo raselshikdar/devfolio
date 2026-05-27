@@ -10,7 +10,7 @@ function verifyAuth(req: NextRequest): boolean {
 export async function POST(req: NextRequest) {
   if (!verifyAuth(req)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const data = await req.json();
-  const item = await db.quote.create({ data: { text: data.text, context: data.context || null, order: data.order || 0 } });
+  const item = await db.quote.create({ data: { text: data.text, context: data.context || null, hidden: data.hidden || false, order: data.order || 0 } });
   return NextResponse.json(item);
 }
 

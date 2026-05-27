@@ -10,7 +10,7 @@ function verifyAuth(req: NextRequest): boolean {
 export async function POST(req: NextRequest) {
   if (!verifyAuth(req)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const data = await req.json();
-  const item = await db.education.create({ data: { degree: data.degree, institute: data.institute, year: data.year || "", detail: data.detail || null, hidden: data.hidden || false, order: data.order || 0 } });
+  const item = await db.audio.create({ data: { title: data.title, url: data.url, description: data.description || null, category: data.category || null, hidden: data.hidden || false, order: data.order || 0 } });
   return NextResponse.json(item);
 }
 
@@ -19,7 +19,7 @@ export async function PUT(req: NextRequest) {
   const data = await req.json();
   const { id, ...updateData } = data;
   if (!id) return NextResponse.json({ error: "ID required" }, { status: 400 });
-  const item = await db.education.update({ where: { id }, data: updateData });
+  const item = await db.audio.update({ where: { id }, data: updateData });
   return NextResponse.json(item);
 }
 
@@ -28,6 +28,6 @@ export async function DELETE(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const id = searchParams.get("id");
   if (!id) return NextResponse.json({ error: "ID required" }, { status: 400 });
-  await db.education.delete({ where: { id } });
+  await db.audio.delete({ where: { id } });
   return NextResponse.json({ success: true });
 }
