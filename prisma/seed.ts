@@ -1,3 +1,5 @@
+import { config } from "dotenv";
+config({ override: true });
 import { db } from "@/lib/db";
 import bcrypt from "bcryptjs";
 

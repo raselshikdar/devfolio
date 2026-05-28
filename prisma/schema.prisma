@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model Admin {
@@ -66,31 +67,33 @@ model Skill {
 }
 
 model Project {
-  id          String   @id @default(cuid())
-  name        String
-  description String
-  image       String?
-  featuredImage String?
-  demoUrl     String?
-  githubUrl   String?
-  tags        String?
-  category    String?
-  featured    Boolean  @default(false)
-  hidden      Boolean  @default(false)
-  order       Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id                String   @id @default(cuid())
+  name              String
+  description       String
+  image             String?
+  featuredImage     String?
+  cloudinaryPublicId String?
+  demoUrl           String?
+  githubUrl         String?
+  tags              String?
+  category          String?
+  featured          Boolean  @default(false)
+  hidden            Boolean  @default(false)
+  order             Int      @default(0)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 }
 
 model GalleryImage {
-  id        String   @id @default(cuid())
-  src       String
-  alt       String
-  category  String?
-  hidden    Boolean  @default(false)
-  order     Int      @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                String   @id @default(cuid())
+  src               String
+  alt               String
+  category          String?
+  cloudinaryPublicId String?
+  hidden            Boolean  @default(false)
+  order             Int      @default(0)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 }
 
 model Note {
@@ -115,35 +118,37 @@ model Quote {
 }
 
 model BlogPost {
-  id            String   @id @default(cuid())
-  title         String
-  date          String
-  excerpt       String?
-  content       String?
-  image         String?
-  featuredImage String?
-  tags          String?
-  category      String?
-  published     Boolean  @default(false)
-  hidden        Boolean  @default(false)
-  order         Int      @default(0)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id                String   @id @default(cuid())
+  title             String
+  date              String
+  excerpt           String?
+  content           String?
+  image             String?
+  featuredImage     String?
+  cloudinaryPublicId String?
+  tags              String?
+  category          String?
+  published         Boolean  @default(false)
+  hidden            Boolean  @default(false)
+  order             Int      @default(0)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 }
 
 model StoreProduct {
-  id            String   @id @default(cuid())
-  name          String
-  price         String
-  image         String?
-  featuredImage String?
-  description   String?
-  category      String?
-  rating        Float?
-  hidden        Boolean  @default(false)
-  order         Int      @default(0)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id                String   @id @default(cuid())
+  name              String
+  price             String
+  image             String?
+  featuredImage     String?
+  cloudinaryPublicId String?
+  description       String?
+  category          String?
+  rating            Float?
+  hidden            Boolean  @default(false)
+  order             Int      @default(0)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 }
 
 model Message {
