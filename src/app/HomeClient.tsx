@@ -53,15 +53,16 @@ const NAV_LINKS = [
 ];
 
 const FALLBACK_EDUCATION = [
-  { id: "e1", degree: "M.Sc. Computer Science", institute: "Stanford University", year: "2019 – 2021", detail: "Specialized in Machine Learning & Distributed Systems" },
-  { id: "e2", degree: "B.Sc. Software Engineering", institute: "MIT", year: "2015 – 2019", detail: "Graduated with Honors, GPA 3.9/4.0" },
-  { id: "e3", degree: "High School Diploma", institute: "Phillips Academy Andover", year: "2011 – 2015", detail: "Focus on Mathematics and Computer Science" },
+  { id: "e1", degree: "SSC — Science", institute: "Chapri Public School & College", year: "2013 – 2015", detail: "" },
+  { id: "e2", degree: "HSC — Humanities", institute: "Chapri Public School & College", year: "2015 – 2017", detail: "" },
+  { id: "e3", degree: "BSS — Political Science", institute: "National University", year: "2017 – 2021", detail: "" },
+  { id: "e4", degree: "MSS — Political Science", institute: "National University", year: "2021 – 2022", detail: "" },
 ];
 
 const FALLBACK_EXPERIENCE = [
-  { id: "x1", role: "Senior Full-Stack Developer", company: "TechNova Inc.", year: "2023 – Present", detail: "Leading a team of 8 engineers building next-gen SaaS platform" },
-  { id: "x2", role: "Full-Stack Developer", company: "CloudSync Labs", year: "2021 – 2023", detail: "Built real-time collaboration tools used by 50K+ users" },
-  { id: "x3", role: "Frontend Developer", company: "PixelCraft Studio", year: "2019 – 2021", detail: "Designed and shipped 15+ client-facing web applications" },
+  { id: "x1", role: "Freelancer & Tech Blogger", company: "Self-Employed", year: "2019 – Present", detail: "Building web solutions and sharing technical knowledge through blog content" },
+  { id: "x2", role: "Open Source Contributor", company: "GitHub", year: "2019 – Present", detail: "Contributing to open-source projects and the developer community" },
+  { id: "x3", role: "Freelance Web Developer", company: "Self-Employed", year: "2021 – Present", detail: "Delivering modern, scalable web applications for clients worldwide" },
 ];
 
 const FALLBACK_SKILLS = [
@@ -113,11 +114,11 @@ const FALLBACK_STORE_ITEMS = [
 
 const FALLBACK_PROFILE = {
   id: "pr1",
-  name: "Alex Morgan",
-  tagline: "Full-Stack Developer & Designer — crafting elegant digital experiences with modern web technologies.",
+  name: "Rasel Shikdar",
+  tagline: "Full-Stack Developer — building modern, scalable, and high-performance web applications with clean UI/UX and smooth user experiences.",
   avatar: "https://picsum.photos/seed/avatar42/300/300",
-  about: "I'm a passionate full-stack developer with 7+ years of experience building high-performance web applications. I specialize in React, Next.js, and Node.js ecosystems, with a keen eye for pixel-perfect UI and scalable architecture. I thrive at the intersection of design and engineering — translating complex requirements into intuitive, accessible products. When I'm not coding, you'll find me exploring open-source projects, writing technical blog posts, or sketching UI concepts in Figma.",
-  email: "alex@example.com",
+  about: "Passionate full-stack developer focused on building modern, scalable, and high-performance web applications with clean UI/UX and smooth user experiences. With 5+ years of experience and 50+ projects completed, I thrive at the intersection of design and engineering — turning complex ideas into elegant digital solutions. My academic background in Political Science (BSS & MSS) gives me a unique analytical perspective that complements my technical expertise.",
+  email: "info@raselsh.pro.bd",
   phone: "",
   location: "",
   website: "",
@@ -125,13 +126,12 @@ const FALLBACK_PROFILE = {
 };
 
 const FALLBACK_SOCIAL_LINKS = [
-  { id: "sl1", platform: "GitHub", url: "#", icon: "github", handle: "" },
-  { id: "sl2", platform: "LinkedIn", url: "#", icon: "linkedin", handle: "" },
-  { id: "sl3", platform: "Twitter", url: "#", icon: "twitter", handle: "" },
-  { id: "sl4", platform: "Instagram", url: "#", icon: "instagram", handle: "" },
-  { id: "sl5", platform: "YouTube", url: "#", icon: "youtube", handle: "" },
-  { id: "sl6", platform: "Facebook", url: "#", icon: "facebook", handle: "" },
-  { id: "sl7", platform: "Dribbble", url: "#", icon: "dribbble", handle: "" },
+  { id: "sl1", platform: "GitHub", url: "https://github.com/raselshikdar", icon: "github", handle: "" },
+  { id: "sl2", platform: "Facebook", url: "https://facebook.com/raselverse", icon: "facebook", handle: "" },
+  { id: "sl3", platform: "LinkedIn", url: "https://linkedin.com/in/raselshikdar", icon: "linkedin", handle: "" },
+  { id: "sl4", platform: "X", url: "https://x.com/raselshikdar_", icon: "twitter", handle: "" },
+  { id: "sl5", platform: "Email", url: "mailto:info@raselsh.pro.bd", icon: "mail", handle: "" },
+  { id: "sl6", platform: "Telegram", url: "https://t.me/rasel597", icon: "send", handle: "" },
 ];
 
 /* ─── Gallery Tabs ─── */
@@ -153,6 +153,8 @@ const ICON_MAP: Record<string, React.ElementType> = {
   facebook: Facebook,
   dribbble: Dribbble,
   x: Twitter,
+  mail: Mail,
+  send: Send,
 };
 
 /* ─── Helper: split comma-separated tags ─── */
@@ -284,8 +286,8 @@ function SingleStatRing({
   progress: number;
   animate: boolean;
 }) {
-  const size = 72;
-  const strokeWidth = 3.5;
+  const size = 64;
+  const strokeWidth = 3;
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference * (1 - progress);
@@ -361,14 +363,14 @@ function StatRings({
   const cProjects  = useCountUp(projects,  1400, animate);
   const cBlogs     = useCountUp(blogPosts,  1400, animate);
   const cProducts  = useCountUp(storeProducts, 1400, animate);
-  const cVisitors  = useCountUp(1200, 1800, animate);
+  const cVisitors  = useCountUp(2500, 1800, animate);
 
   const values: Record<StatKey, { display: string; progress: number }> = {
     projects:   { display: String(cProjects),   progress: Math.min(projects / 20, 1) },
-    experience: { display: animate ? "7+" : "0", progress: 7 / 10 },
+    experience: { display: animate ? "5+" : "0", progress: 5 / 10 },
     blogs:      { display: String(cBlogs),       progress: Math.min(blogPosts / 15, 1) },
     products:   { display: String(cProducts),    progress: Math.min(storeProducts / 15, 1) },
-    visitors:   { display: cVisitors >= 1000 ? `${(cVisitors / 1000).toFixed(1)}K` : String(cVisitors), progress: Math.min(1200 / 5000, 1) },
+    visitors:   { display: cVisitors >= 1000 ? `${(cVisitors / 1000).toFixed(1)}K` : String(cVisitors), progress: Math.min(2500 / 5000, 1) },
   };
 
   return (

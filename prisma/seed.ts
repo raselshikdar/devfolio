@@ -9,7 +9,7 @@ async function main() {
   if (!existingAdmin) {
     const hashedPassword = await bcrypt.hash("admin123", 10);
     await db.admin.create({
-      data: { email: "admin@alex.dev", password: hashedPassword, name: "Alex Morgan" },
+      data: { email: "admin@alex.dev", password: hashedPassword, name: "Rasel Shikdar" },
     });
     console.log("✅ Admin user created: admin@alex.dev / admin123");
   } else {
@@ -21,14 +21,14 @@ async function main() {
   if (profileCount === 0) {
     await db.profile.create({
       data: {
-        name: "Alex Morgan",
-        tagline: "Full-Stack Developer & Designer — crafting elegant digital experiences with modern web technologies.",
+        name: "Rasel Shikdar",
+        tagline: "Full-Stack Developer — building modern, scalable, and high-performance web applications with clean UI/UX and smooth user experiences.",
         avatar: "https://picsum.photos/seed/avatar42/300/300",
-        about: "I'm a passionate full-stack developer with 7+ years of experience building high-performance web applications. I specialize in React, Next.js, and Node.js ecosystems, with a keen eye for pixel-perfect UI and scalable architecture. I thrive at the intersection of design and engineering — translating complex requirements into intuitive, accessible products. When I'm not coding, you'll find me exploring open-source projects, writing technical blog posts, or sketching UI concepts in Figma.",
-        email: "alex.morgan@email.com",
-        phone: "+1 (555) 123-4567",
-        location: "San Francisco, CA",
-        website: "alexmorgan.dev",
+        about: "Passionate full-stack developer focused on building modern, scalable, and high-performance web applications with clean UI/UX and smooth user experiences. With 5+ years of experience and 50+ projects completed, I thrive at the intersection of design and engineering — turning complex ideas into elegant digital solutions. My academic background in Political Science (BSS & MSS) gives me a unique analytical perspective that complements my technical expertise.",
+        email: "info@raselsh.pro.bd",
+        phone: null,
+        location: null,
+        website: null,
       },
     });
     console.log("✅ Profile seeded");
@@ -39,9 +39,10 @@ async function main() {
   if (eduCount === 0) {
     await db.education.createMany({
       data: [
-        { degree: "M.Sc. Computer Science", institute: "Stanford University", year: "2019 – 2021", detail: "Specialized in Machine Learning & Distributed Systems", order: 1 },
-        { degree: "B.Sc. Software Engineering", institute: "MIT", year: "2015 – 2019", detail: "Graduated with Honors, GPA 3.9/4.0", order: 2 },
-        { degree: "High School Diploma", institute: "Phillips Academy Andover", year: "2011 – 2015", detail: "Focus on Mathematics and Computer Science", order: 3 },
+        { degree: "SSC — Science", institute: "Chapri Public School & College", year: "2013 – 2015", detail: "", order: 1 },
+        { degree: "HSC — Humanities", institute: "Chapri Public School & College", year: "2015 – 2017", detail: "", order: 2 },
+        { degree: "BSS — Political Science", institute: "National University", year: "2017 – 2021", detail: "", order: 3 },
+        { degree: "MSS — Political Science", institute: "National University", year: "2021 – 2022", detail: "", order: 4 },
       ],
     });
     console.log("✅ Education seeded");
@@ -52,9 +53,9 @@ async function main() {
   if (expCount === 0) {
     await db.experience.createMany({
       data: [
-        { role: "Senior Full-Stack Developer", company: "TechNova Inc.", year: "2023 – Present", detail: "Leading a team of 8 engineers building next-gen SaaS platform", order: 1 },
-        { role: "Full-Stack Developer", company: "CloudSync Labs", year: "2021 – 2023", detail: "Built real-time collaboration tools used by 50K+ users", order: 2 },
-        { role: "Frontend Developer", company: "PixelCraft Studio", year: "2019 – 2021", detail: "Designed and shipped 15+ client-facing web applications", order: 3 },
+        { role: "Freelancer & Tech Blogger", company: "Self-Employed", year: "2019 – Present", detail: "Building web solutions and sharing technical knowledge through blog content", order: 1 },
+        { role: "Open Source Contributor", company: "GitHub", year: "2019 – Present", detail: "Contributing to open-source projects and the developer community", order: 2 },
+        { role: "Freelance Web Developer", company: "Self-Employed", year: "2021 – Present", detail: "Delivering modern, scalable web applications for clients worldwide", order: 3 },
       ],
     });
     console.log("✅ Experience seeded");
@@ -155,13 +156,12 @@ async function main() {
   if (socialCount === 0) {
     await db.socialLink.createMany({
       data: [
-        { platform: "GitHub", url: "#", icon: "Github", handle: "@alexmorgan", order: 1 },
-        { platform: "LinkedIn", url: "#", icon: "Linkedin", handle: "in/alexmorgan", order: 2 },
-        { platform: "Twitter / X", url: "#", icon: "Twitter", handle: "@alexmorgan_dev", order: 3 },
-        { platform: "Instagram", url: "#", icon: "Instagram", handle: "@alex.codes", order: 4 },
-        { platform: "YouTube", url: "#", icon: "Youtube", handle: "Alex Morgan Dev", order: 5 },
-        { platform: "Facebook", url: "#", icon: "Facebook", handle: "Alex Morgan", order: 6 },
-        { platform: "Dribbble", url: "#", icon: "Dribbble", handle: "@alexmorgan", order: 7 },
+        { platform: "GitHub", url: "https://github.com/raselshikdar", icon: "github", handle: "", order: 1 },
+        { platform: "Facebook", url: "https://facebook.com/raselverse", icon: "facebook", handle: "", order: 2 },
+        { platform: "LinkedIn", url: "https://linkedin.com/in/raselshikdar", icon: "linkedin", handle: "", order: 3 },
+        { platform: "X", url: "https://x.com/raselshikdar_", icon: "twitter", handle: "", order: 4 },
+        { platform: "Email", url: "mailto:info@raselsh.pro.bd", icon: "mail", handle: "", order: 5 },
+        { platform: "Telegram", url: "https://t.me/rasel597", icon: "send", handle: "", order: 6 },
       ],
     });
     console.log("✅ Social links seeded");
