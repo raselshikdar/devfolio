@@ -11,18 +11,18 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Alex Morgan — Full-Stack Developer & Designer",
+  title: "Rasel Shikdar — Full-Stack Developer",
   description:
-    "Personal portfolio of Alex Morgan — Full-Stack Developer specializing in modern web technologies, UI/UX design, and scalable applications.",
+    "Personal portfolio of Rasel Shikdar — Full-Stack Developer specializing in modern web technologies, scalable applications, and clean UI/UX.",
   keywords: [
     "portfolio",
     "developer",
     "full-stack",
-    "design",
+    "Rasel Shikdar",
     "Next.js",
     "React",
   ],
-  authors: [{ name: "Alex Morgan" }],
+  authors: [{ name: "Rasel Shikdar" }],
   icons: {
     icon: "https://z-cdn.chatglm.cn/z-ai/static/logo.svg",
   },

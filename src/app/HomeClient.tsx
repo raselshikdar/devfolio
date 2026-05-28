@@ -286,14 +286,14 @@ function SingleStatRing({
   progress: number;
   animate: boolean;
 }) {
-  const size = 64;
+  const size = 56;
   const strokeWidth = 3;
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference * (1 - progress);
 
   return (
-    <div className="flex flex-col items-center gap-2">
+    <div className="flex flex-col items-center gap-1.5">
       <div className="relative" style={{ width: size, height: size }}>
         <svg
           width={size}
@@ -328,7 +328,7 @@ function SingleStatRing({
           />
         </svg>
         {/* value centred inside the ring */}
-        <span className="absolute inset-0 flex items-center justify-center text-sm font-bold text-foreground">
+        <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-foreground">
           {displayValue}
         </span>
       </div>
@@ -374,7 +374,7 @@ function StatRings({
   };
 
   return (
-    <div ref={containerRef} className="flex flex-wrap justify-center gap-6 md:gap-10">
+    <div ref={containerRef} className="flex flex-wrap justify-center gap-5 md:gap-8">
       {STAT_ITEMS.map((s) => (
         <SingleStatRing
           key={s.key}
