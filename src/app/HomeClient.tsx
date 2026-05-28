@@ -35,6 +35,8 @@ import {
   ExternalLink,
   Quote,
   StickyNote,
+  BarChart3,
+  Eye,
 } from "lucide-react";
 
 /* ──────────────────────── Fallback Data ──────────────────────── */
@@ -441,95 +443,101 @@ export default function PortfolioPage() {
 
       {/* ─── Main Content ─── */}
       <main className="flex-1 max-w-6xl mx-auto w-full px-4 py-6 space-y-6">
-        {/* ─── Hero ─── */}
-        <FadeIn>
-          <CardShell className="p-6 md:p-8">
-            <div className="flex flex-col md:flex-row items-center gap-6">
-              <div className="flex-1 text-center md:text-left">
-                <h1 className="text-3xl md:text-4xl font-bold text-foreground leading-tight">
-                  Hi, I&apos;m <span className="text-emerald">{profile.name}</span>
-                </h1>
-                <p className="mt-2 text-muted-foreground text-sm md:text-base">
-                  {profile.tagline}
-                </p>
-                <div className="mt-4 flex flex-wrap gap-3 justify-center md:justify-start">
-                  <a href="#contact" className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald text-white text-sm font-semibold hover:bg-emerald-hover transition-colors shadow-sm">
-                    <Mail className="w-4 h-4" /> Contact Me
-                  </a>
-                  {profile.resume && (
-                    <a href={profile.resume} className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-emerald text-emerald text-sm font-semibold hover:bg-emerald/5 transition-colors">
-                      <Download className="w-4 h-4" /> Download CV
+        {/* ─── Hero + About: Side by side on desktop ─── */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* ─── Hero ─── */}
+          <FadeIn className="h-full">
+            <CardShell className="p-6 md:p-8 h-full">
+              <div className="flex flex-col md:flex-row items-center gap-6">
+                <div className="flex-1 text-center md:text-left">
+                  <h1 className="text-3xl md:text-4xl font-bold text-foreground leading-tight">
+                    Hi, I&apos;m <span className="text-emerald">{profile.name}</span>
+                  </h1>
+                  <p className="mt-2 text-muted-foreground text-sm md:text-base">
+                    {profile.tagline}
+                  </p>
+                  <div className="mt-4 flex flex-wrap gap-3 justify-center md:justify-start">
+                    <a href="#contact" className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald text-white text-sm font-semibold hover:bg-emerald-hover transition-colors shadow-sm">
+                      <Mail className="w-4 h-4" /> Contact Me
                     </a>
-                  )}
-                  {!profile.resume && (
-                    <a href="#" className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-emerald text-emerald text-sm font-semibold hover:bg-emerald/5 transition-colors">
-                      <Download className="w-4 h-4" /> Download CV
-                    </a>
-                  )}
+                    {profile.resume && (
+                      <a href={profile.resume} className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-emerald text-emerald text-sm font-semibold hover:bg-emerald/5 transition-colors">
+                        <Download className="w-4 h-4" /> Download CV
+                      </a>
+                    )}
+                    {!profile.resume && (
+                      <a href="#" className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-emerald text-emerald text-sm font-semibold hover:bg-emerald/5 transition-colors">
+                        <Download className="w-4 h-4" /> Download CV
+                      </a>
+                    )}
+                  </div>
+                </div>
+                <div className="shrink-0">
+                  <div className="w-28 h-28 md:w-36 md:h-36 rounded-full border-2 border-emerald/30 overflow-hidden shadow-md">
+                    <img src={profile.avatar || "https://picsum.photos/seed/avatar42/300/300"} alt={`${profile.name} profile photo`} className="w-full h-full object-cover" />
+                  </div>
                 </div>
               </div>
-              <div className="shrink-0">
-                <div className="w-28 h-28 md:w-36 md:h-36 rounded-full border-2 border-emerald/30 overflow-hidden shadow-md">
-                  <img src={profile.avatar || "https://picsum.photos/seed/avatar42/300/300"} alt={`${profile.name} profile photo`} className="w-full h-full object-cover" />
-                </div>
+            </CardShell>
+          </FadeIn>
+
+          {/* ─── About ─── */}
+          <FadeIn className="h-full">
+            <CardShell className="p-6 h-full" id="about">
+              <SectionHeading icon={User} title="About Me" />
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                {profile.about}
+              </p>
+            </CardShell>
+          </FadeIn>
+        </div>
+
+        {/* ─── Education + Experience: Side by side on desktop ─── */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* ─── Education ─── */}
+          <FadeIn className="h-full">
+            <CardShell className="p-6 h-full" id="education">
+              <SectionHeading icon={GraduationCap} title="Education" />
+              <div className="relative pl-6 border-l-2 border-emerald/30 space-y-5">
+                {education.map((e) => (
+                  <div key={e.id} className="relative">
+                    <span className="absolute -left-[1.55rem] top-1 w-3 h-3 rounded-full bg-emerald border-2 border-background" />
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1">
+                      <div>
+                        <h3 className="text-sm font-semibold text-foreground">{e.degree}</h3>
+                        <p className="text-xs text-muted-foreground">{e.institute}</p>
+                      </div>
+                      <span className="text-xs font-medium text-emerald whitespace-nowrap">{e.year}</span>
+                    </div>
+                    {e.detail && <p className="text-xs text-muted-foreground mt-0.5">{e.detail}</p>}
+                  </div>
+                ))}
               </div>
-            </div>
-          </CardShell>
-        </FadeIn>
+            </CardShell>
+          </FadeIn>
 
-        {/* ─── About ─── */}
-        <FadeIn>
-          <CardShell className="p-6" id="about">
-            <SectionHeading icon={User} title="About Me" />
-            <p className="text-sm leading-relaxed text-muted-foreground">
-              {profile.about}
-            </p>
-          </CardShell>
-        </FadeIn>
-
-        {/* ─── Education ─── */}
-        <FadeIn>
-          <CardShell className="p-6" id="education">
-            <SectionHeading icon={GraduationCap} title="Education" />
-            <div className="relative pl-6 border-l-2 border-emerald/30 space-y-5">
-              {education.map((e) => (
-                <div key={e.id} className="relative">
-                  <span className="absolute -left-[1.55rem] top-1 w-3 h-3 rounded-full bg-emerald border-2 border-background" />
-                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1">
-                    <div>
-                      <h3 className="text-sm font-semibold text-foreground">{e.degree}</h3>
-                      <p className="text-xs text-muted-foreground">{e.institute}</p>
+          {/* ─── Experience ─── */}
+          <FadeIn className="h-full">
+            <CardShell className="p-6 h-full" id="experience">
+              <SectionHeading icon={Briefcase} title="Experience" />
+              <div className="relative pl-6 border-l-2 border-emerald/30 space-y-5">
+                {experience.map((e) => (
+                  <div key={e.id} className="relative">
+                    <span className="absolute -left-[1.55rem] top-1 w-3 h-3 rounded-full bg-emerald border-2 border-background" />
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1">
+                      <div>
+                        <h3 className="text-sm font-semibold text-foreground">{e.role}</h3>
+                        <p className="text-xs text-muted-foreground">{e.company}</p>
+                      </div>
+                      <span className="text-xs font-medium text-emerald whitespace-nowrap">{e.year}</span>
                     </div>
-                    <span className="text-xs font-medium text-emerald whitespace-nowrap">{e.year}</span>
+                    {e.detail && <p className="text-xs text-muted-foreground mt-0.5">{e.detail}</p>}
                   </div>
-                  {e.detail && <p className="text-xs text-muted-foreground mt-0.5">{e.detail}</p>}
-                </div>
-              ))}
-            </div>
-          </CardShell>
-        </FadeIn>
-
-        {/* ─── Experience ─── */}
-        <FadeIn>
-          <CardShell className="p-6" id="experience">
-            <SectionHeading icon={Briefcase} title="Experience" />
-            <div className="relative pl-6 border-l-2 border-emerald/30 space-y-5">
-              {experience.map((e) => (
-                <div key={e.id} className="relative">
-                  <span className="absolute -left-[1.55rem] top-1 w-3 h-3 rounded-full bg-emerald border-2 border-background" />
-                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1">
-                    <div>
-                      <h3 className="text-sm font-semibold text-foreground">{e.role}</h3>
-                      <p className="text-xs text-muted-foreground">{e.company}</p>
-                    </div>
-                    <span className="text-xs font-medium text-emerald whitespace-nowrap">{e.year}</span>
-                  </div>
-                  {e.detail && <p className="text-xs text-muted-foreground mt-0.5">{e.detail}</p>}
-                </div>
-              ))}
-            </div>
-          </CardShell>
-        </FadeIn>
+                ))}
+              </div>
+            </CardShell>
+          </FadeIn>
+        </div>
 
         {/* ─── Gallery (before Skills) ─── */}
         <FadeIn>
@@ -731,9 +739,9 @@ export default function PortfolioPage() {
         <FadeIn>
           <div id="projects">
             <SectionHeading icon={Star} title="Projects" viewAllHref="/projects" />
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {homepageProjects.map((p, i) => (
-                <FadeIn key={p.id} delay={i * 0.08}>
+                <FadeIn key={p.id} delay={i * 0.08} className={i >= 3 ? "md:hidden" : ""}>
                   <CardShell className="overflow-hidden h-full flex flex-col">
                     <div className="aspect-[16/9] overflow-hidden">
                       <img src={resolveImage(p)} alt={p.name} className="w-full h-full object-cover transition-transform duration-300 hover:scale-105" loading="lazy" />
@@ -770,7 +778,7 @@ export default function PortfolioPage() {
         <FadeIn>
           <div id="blog">
             <SectionHeading icon={FileText} title="Blog" viewAllHref="/blog" />
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {blogPosts.map((post, i) => (
                 <FadeIn key={post.id} delay={i * 0.08}>
                   <CardShell className="overflow-hidden h-full flex flex-col">
@@ -799,7 +807,7 @@ export default function PortfolioPage() {
         <FadeIn>
           <div id="store">
             <SectionHeading icon={ShoppingCart} title="Store" viewAllHref="/store" />
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {storeProducts.map((item, i) => (
                 <FadeIn key={item.id} delay={i * 0.08}>
                   <CardShell className="overflow-hidden">
@@ -820,6 +828,29 @@ export default function PortfolioPage() {
               ))}
             </div>
           </div>
+        </FadeIn>
+
+        {/* ─── Quick Stats ─── */}
+        <FadeIn>
+          <CardShell className="p-6" id="stats">
+            <SectionHeading icon={BarChart3} title="Quick Stats" />
+            <div className="flex flex-wrap justify-center gap-6 md:gap-10">
+              {[
+                { label: "Total Projects", value: projects.length, color: "bg-emerald" },
+                { label: "Years of Experience", value: "7+", color: "bg-blue-500" },
+                { label: "Blogs", value: blogPosts.length, color: "bg-purple-500" },
+                { label: "Store Products", value: storeProducts.length, color: "bg-amber-500" },
+                { label: "Visitors", value: "1.2K", color: "bg-rose-500" },
+              ].map((stat) => (
+                <div key={stat.label} className="flex flex-col items-center gap-2">
+                  <div className={`${stat.color} w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center shadow-md`}>
+                    <span className="text-white text-lg md:text-xl font-bold">{stat.value}</span>
+                  </div>
+                  <span className="text-[10px] md:text-xs font-medium text-muted-foreground text-center leading-tight">{stat.label}</span>
+                </div>
+              ))}
+            </div>
+          </CardShell>
         </FadeIn>
 
         {/* ─── Social Media Card ─── */}
