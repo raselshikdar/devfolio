@@ -36,7 +36,6 @@ import {
   Quote,
   StickyNote,
   BarChart3,
-  Eye,
 } from "lucide-react";
 
 /* ──────────────────────── Fallback Data ──────────────────────── */
@@ -233,6 +232,158 @@ function CardShell({ children, className = "" }: { children: React.ReactNode; cl
       className={`rounded-2xl border border-border bg-card shadow-sm transition-colors duration-200 hover:border-emerald ${className}`}
     >
       {children}
+    </div>
+  );
+}
+
+/* ──────────────────── Count-Up Hook ──────────────────── */
+
+function useCountUp(end: number, duration = 1400, started = false) {
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    if (!started) { setCount(0); return; }
+    let frame: number;
+    const startTime = performance.now();
+    const step = (now: number) => {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setCount(Math.round(eased * end));
+      if (progress < 1) frame = requestAnimationFrame(step);
+    };
+    frame = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(frame);
+  }, [end, duration, started]);
+  return count;
+}
+
+/* ──────────────────── Stat Ring Component ──────────────────── */
+
+const STAT_ITEMS = [
+  { key: "projects",  label: "Total Projects",      color: "#06B6D4", glow: "0 0 8px 2px rgba(6,182,212,.45)" },
+  { key: "experience",label: "Years of Experience",  color: "#A855F7", glow: "0 0 8px 2px rgba(168,85,247,.45)" },
+  { key: "blogs",     label: "Blogs",                color: "#EC4899", glow: "0 0 8px 2px rgba(236,72,153,.45)" },
+  { key: "products",  label: "Store Products",       color: "#06B6D4", glow: "0 0 8px 2px rgba(6,182,212,.45)" },
+  { key: "visitors",  label: "Visitors",             color: "#A855F7", glow: "0 0 8px 2px rgba(168,85,247,.45)" },
+] as const;
+
+type StatKey = (typeof STAT_ITEMS)[number]["key"];
+
+function SingleStatRing({
+  label,
+  color,
+  glow,
+  displayValue,
+  progress,
+  animate,
+}: {
+  label: string;
+  color: string;
+  glow: string;
+  displayValue: string;
+  progress: number;
+  animate: boolean;
+}) {
+  const size = 72;
+  const strokeWidth = 3.5;
+  const radius = (size - strokeWidth) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference * (1 - progress);
+
+  return (
+    <div className="flex flex-col items-center gap-2">
+      <div className="relative" style={{ width: size, height: size }}>
+        <svg
+          width={size}
+          height={size}
+          className="transform -rotate-90"
+          style={{ filter: glow }}
+        >
+          {/* background track */}
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={strokeWidth}
+            className="text-border"
+          />
+          {/* progress arc */}
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
+            fill="none"
+            stroke={color}
+            strokeWidth={strokeWidth}
+            strokeLinecap="round"
+            strokeDasharray={circumference}
+            strokeDashoffset={animate ? offset : circumference}
+            style={{
+              transition: animate ? "stroke-dashoffset 1.4s cubic-bezier(.4,0,.2,1)" : "none",
+            }}
+          />
+        </svg>
+        {/* value centred inside the ring */}
+        <span className="absolute inset-0 flex items-center justify-center text-sm font-bold text-foreground">
+          {displayValue}
+        </span>
+      </div>
+      <span className="text-[10px] md:text-xs font-medium text-muted-foreground text-center leading-tight">
+        {label}
+      </span>
+    </div>
+  );
+}
+
+function StatRings({
+  projects,
+  blogPosts,
+  storeProducts,
+}: {
+  projects: number;
+  blogPosts: number;
+  storeProducts: number;
+}) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const isInView = useInView(containerRef, { once: true, margin: "-40px" });
+  const [animate, setAnimate] = useState(false);
+
+  useEffect(() => {
+    if (isInView) {
+      const t = setTimeout(() => setAnimate(true), 80);
+      return () => clearTimeout(t);
+    }
+  }, [isInView]);
+
+  /* count-up hooks — only start when visible */
+  const cProjects  = useCountUp(projects,  1400, animate);
+  const cBlogs     = useCountUp(blogPosts,  1400, animate);
+  const cProducts  = useCountUp(storeProducts, 1400, animate);
+  const cVisitors  = useCountUp(1200, 1800, animate);
+
+  const values: Record<StatKey, { display: string; progress: number }> = {
+    projects:   { display: String(cProjects),   progress: Math.min(projects / 20, 1) },
+    experience: { display: animate ? "7+" : "0", progress: 7 / 10 },
+    blogs:      { display: String(cBlogs),       progress: Math.min(blogPosts / 15, 1) },
+    products:   { display: String(cProducts),    progress: Math.min(storeProducts / 15, 1) },
+    visitors:   { display: cVisitors >= 1000 ? `${(cVisitors / 1000).toFixed(1)}K` : String(cVisitors), progress: Math.min(1200 / 5000, 1) },
+  };
+
+  return (
+    <div ref={containerRef} className="flex flex-wrap justify-center gap-6 md:gap-10">
+      {STAT_ITEMS.map((s) => (
+        <SingleStatRing
+          key={s.key}
+          label={s.label}
+          color={s.color}
+          glow={s.glow}
+          displayValue={values[s.key].display}
+          progress={values[s.key].progress}
+          animate={animate}
+        />
+      ))}
     </div>
   );
 }
@@ -834,22 +985,11 @@ export default function PortfolioPage() {
         <FadeIn>
           <CardShell className="p-6" id="stats">
             <SectionHeading icon={BarChart3} title="Quick Stats" />
-            <div className="flex flex-wrap justify-center gap-6 md:gap-10">
-              {[
-                { label: "Total Projects", value: projects.length, color: "bg-emerald" },
-                { label: "Years of Experience", value: "7+", color: "bg-blue-500" },
-                { label: "Blogs", value: blogPosts.length, color: "bg-purple-500" },
-                { label: "Store Products", value: storeProducts.length, color: "bg-amber-500" },
-                { label: "Visitors", value: "1.2K", color: "bg-rose-500" },
-              ].map((stat) => (
-                <div key={stat.label} className="flex flex-col items-center gap-2">
-                  <div className={`${stat.color} w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center shadow-md`}>
-                    <span className="text-white text-lg md:text-xl font-bold">{stat.value}</span>
-                  </div>
-                  <span className="text-[10px] md:text-xs font-medium text-muted-foreground text-center leading-tight">{stat.label}</span>
-                </div>
-              ))}
-            </div>
+            <StatRings
+              projects={projects.length}
+              blogPosts={blogPosts.length}
+              storeProducts={storeProducts.length}
+            />
           </CardShell>
         </FadeIn>
 
