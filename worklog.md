@@ -73,3 +73,22 @@ Stage Summary:
 - All features implemented and working
 - Project builds and runs successfully
 - All pages and APIs return correct HTTP responses
+
+---
+Task ID: 1
+Agent: Main Agent
+Task: Fix preview panel not showing (404 error on homepage)
+
+Work Log:
+- Investigated dev server returning 404 for GET /
+- Found corrupted .next build cache causing build-manifest.json ENOENT errors
+- Discovered .zscripts/dev.sh health check fails on 404, triggering EXIT trap that kills the dev server
+- Root cause: corrupted .next cache → 404 → dev.sh fails health check → server killed
+- Fixed by: deleting corrupted .next cache, then re-running .zscripts/dev.sh
+- Verified all routes return 200 through both port 3000 (direct) and port 81 (Caddy proxy)
+
+Stage Summary:
+- Cleared corrupted .next cache directory
+- Re-ran .zscripts/dev.sh which properly starts the dev server with health checks
+- All routes confirmed working: /, /admin, /blog, /gallery, /projects, /store, /contact, /api/data
+- Preview panel should now work via port 81 (Caddy reverse proxy)
