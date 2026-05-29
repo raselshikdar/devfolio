@@ -30,3 +30,33 @@ Stage Summary:
 - Persistent global audio player continues across page navigation
 - Public API polls every 8 seconds for real-time status updates
 - All existing frontend UI/UX preserved (no layout/structure changes)
+
+---
+Task ID: 2
+Agent: Main
+Task: Update project for GitHub, Vercel, and Cloudflare Pages deployment compatibility
+
+Work Log:
+- Created .env.example with all required environment variables documented
+- Updated .gitignore with Cloudflare-specific entries (.wrangler/, .dev.vars, worker/, .open-next/)
+- Installed @opennextjs/cloudflare (v1.19.11) and wrangler (v4.95.0) as dev dependencies (supports Next.js 16.2.6+)
+- Installed @neondatabase/serverless and @prisma/adapter-neon as dependencies for edge-compatible Prisma
+- Created wrangler.toml with nodejs_compat flag and assets directory configuration
+- Created open-next.config.ts for @opennextjs/cloudflare build adapter
+- Updated src/lib/db.ts with runtime-aware Prisma client (standard PrismaClient for Node.js/Vercel, PrismaNeon adapter for Edge/Cloudflare)
+- Replaced Buffer.from() with btoa()/atob() in auth route and all 19 admin routes for edge compatibility
+- Updated tsconfig.json to exclude examples/ and skills/ directories from TypeScript compilation
+- Fixed pre-existing TypeScript error: added id prop to CardShell component in HomeClient.tsx
+- Fixed pre-existing TypeScript error: added buyUrl field to FALLBACK_STORE_ITEMS in HomeClient.tsx
+- Fixed pre-existing TypeScript error: added type assertion for categories in ProjectsClient.tsx
+- Added Cloudflare build scripts to package.json (cf:build, cf:preview, cf:deploy)
+- Created env.d.ts with CloudflareEnv type declaration
+- Verified both npm run build (Vercel) and npm run cf:build (Cloudflare) pass successfully
+
+Stage Summary:
+- Project is now fully compatible with GitHub, Vercel, and Cloudflare Pages deployment
+- Vercel deployment: works with standard `npm run build` (no changes needed)
+- Cloudflare deployment: uses @opennextjs/cloudflare adapter with edge-compatible Prisma client
+- All Buffer usage replaced with web-standard btoa/atob for universal compatibility
+- Pre-existing TypeScript errors fixed for clean builds on all platforms
+- No design, layout, structure, or functionality changes made

@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Create a simple session token (base64 encoded admin id + timestamp)
-    const token = Buffer.from(`${admin.id}:${Date.now()}`).toString("base64");
+    const token = btoa(`${admin.id}:${Date.now()}`);
 
     const response = NextResponse.json({
       success: true,

@@ -4,7 +4,7 @@ import { db } from "@/lib/db";
 // Verify admin token from cookie
 function verifyToken(token: string): boolean {
   try {
-    const decoded = Buffer.from(token, "base64").toString();
+    const decoded = atob(token);
     return decoded.includes(":"); // Simple validation
   } catch {
     return false;

@@ -114,9 +114,9 @@ const FALLBACK_BLOG_POSTS = [
 ];
 
 const FALLBACK_STORE_ITEMS = [
-  { id: "st1", name: "UI Component Kit", price: "$29", image: "https://picsum.photos/seed/store1/300/200", featuredImage: "", description: "", category: "", rating: 4.8 },
-  { id: "st2", name: "React Hooks Handbook", price: "$19", image: "https://picsum.photos/seed/store2/300/200", featuredImage: "", description: "", category: "", rating: 4.5 },
-  { id: "st3", name: "Design System Template", price: "$39", image: "https://picsum.photos/seed/store3/300/200", featuredImage: "", description: "", category: "", rating: 4.9 },
+  { id: "st1", name: "UI Component Kit", price: "$29", image: "https://picsum.photos/seed/store1/300/200", featuredImage: "", description: "", category: "", rating: 4.8, buyUrl: "" },
+  { id: "st2", name: "React Hooks Handbook", price: "$19", image: "https://picsum.photos/seed/store2/300/200", featuredImage: "", description: "", category: "", rating: 4.5, buyUrl: "" },
+  { id: "st3", name: "Design System Template", price: "$39", image: "https://picsum.photos/seed/store3/300/200", featuredImage: "", description: "", category: "", rating: 4.9, buyUrl: "" },
 ];
 
 const FALLBACK_PROFILE = {
@@ -235,9 +235,10 @@ function SectionHeading({
 
 /* ──────────────────── Card Shell ──────────────────── */
 
-function CardShell({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+function CardShell({ children, className = "", id }: { children: React.ReactNode; className?: string; id?: string }) {
   return (
     <div
+      id={id}
       className={`rounded-2xl border border-border bg-card shadow-sm transition-colors duration-200 hover:border-emerald ${className}`}
     >
       {children}

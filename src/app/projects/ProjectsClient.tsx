@@ -251,7 +251,7 @@ export default function ProjectsPage() {
   /* ─── Derived ─── */
   const categories = [
     "All",
-    ...Array.from(new Set(projects.map((p) => p.category).filter(Boolean))),
+    ...Array.from(new Set(projects.map((p) => p.category).filter(Boolean))) as string[],
   ];
 
   const filtered = projects.filter((p) => {

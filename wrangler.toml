@@ -1,0 +1,14 @@
+#:schema node_modules/wrangler/config-schema.json
+name = "rasel-shikdar-portfolio"
+
+# Compatibility flags for Node.js API support in Workers
+compatibility_flags = ["nodejs_compat"]
+compatibility_date = "2026-05-29"
+
+# Asset binding for static files served by the Worker
+[assets]
+directory = ".open-next/assets"
+
+# Environment variables (secrets should be set via `wrangler secret put` or Cloudflare dashboard)
+# [vars]
+# These are non-secret values only. Secrets go in the dashboard.

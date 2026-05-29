@@ -5,7 +5,7 @@ function verifyAuth(req: NextRequest): boolean {
   const token = req.cookies.get("admin_token")?.value;
   if (!token) return false;
   try {
-    return Buffer.from(token, "base64").toString().includes(":");
+    return atob(token).includes(":");
   } catch {
     return false;
   }
