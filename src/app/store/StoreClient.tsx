@@ -14,6 +14,7 @@ import {
   SlidersHorizontal,
   Star,
   Filter,
+  ExternalLink,
 } from "lucide-react";
 
 /* ─── Types ─── */
@@ -27,6 +28,7 @@ interface StoreProduct {
   description?: string | null;
   category?: string | null;
   rating?: number | null;
+  buyUrl?: string | null;
 }
 
 /* ─── Fallback Data ─── */
@@ -443,9 +445,20 @@ export default function StorePage() {
                             </span>
                           )}
                         </div>
-                        <button className="px-3 py-1.5 rounded-lg bg-emerald text-white text-xs font-semibold hover:bg-emerald-hover transition-colors">
-                          Buy Now
-                        </button>
+                        {item.buyUrl ? (
+                          <a
+                            href={item.buyUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="px-3 py-1.5 rounded-lg bg-emerald text-white text-xs font-semibold hover:bg-emerald-hover transition-colors inline-flex items-center gap-1"
+                          >
+                            Buy Now <ExternalLink className="w-3 h-3" />
+                          </a>
+                        ) : (
+                          <button className="px-3 py-1.5 rounded-lg bg-emerald text-white text-xs font-semibold hover:bg-emerald-hover transition-colors">
+                            Buy Now
+                          </button>
+                        )}
                       </div>
                     </div>
                   </CardShell>

@@ -21,6 +21,7 @@ export async function GET() {
       code,
       links,
       guestbookEntries,
+      welcomePopup,
     ] = await Promise.all([
       db.profile.findFirst({ where: { hidden: false } }),
       db.education.findMany({ where: { hidden: false }, orderBy: { order: "asc" } }),
@@ -38,6 +39,7 @@ export async function GET() {
       db.code.findMany({ where: { hidden: false }, orderBy: { order: "asc" } }),
       db.link.findMany({ where: { hidden: false }, orderBy: { order: "asc" } }),
       db.guestbookEntry.findMany({ where: { hidden: false }, orderBy: { createdAt: "desc" } }),
+      db.welcomePopup.findFirst({ where: { enabled: true } }),
     ]);
 
     return NextResponse.json({
@@ -57,11 +59,12 @@ export async function GET() {
       code,
       links,
       guestbookEntries,
+      welcomePopup,
     });
   } catch (error) {
     console.error("[/api/data] Database query failed:", error);
     return NextResponse.json(
-      { error: "Failed to fetch data", profile: null, education: [], experience: [], skills: [], projects: [], galleryImages: [], notes: [], quotes: [], blogPosts: [], storeProducts: [], socialLinks: [], audio: [], video: [], code: [], links: [], guestbookEntries: [] },
+      { error: "Failed to fetch data", profile: null, education: [], experience: [], skills: [], projects: [], galleryImages: [], notes: [], quotes: [], blogPosts: [], storeProducts: [], socialLinks: [], audio: [], video: [], code: [], links: [], guestbookEntries: [], welcomePopup: null },
       { status: 500 }
     );
   }

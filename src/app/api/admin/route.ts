@@ -36,6 +36,7 @@ export async function GET(req: NextRequest) {
     code,
     links,
     guestbookEntries,
+    welcomePopups,
   ] = await Promise.all([
     db.profile.findFirst(),
     db.education.findMany({ orderBy: { order: "asc" } }),
@@ -54,6 +55,7 @@ export async function GET(req: NextRequest) {
     db.code.findMany({ orderBy: { order: "asc" } }),
     db.link.findMany({ orderBy: { order: "asc" } }),
     db.guestbookEntry.findMany({ orderBy: { createdAt: "desc" } }),
+    db.welcomePopup.findMany({ orderBy: { createdAt: "desc" } }),
   ]);
 
   return NextResponse.json({
@@ -74,5 +76,6 @@ export async function GET(req: NextRequest) {
     code,
     links,
     guestbookEntries,
+    welcomePopups,
   });
 }

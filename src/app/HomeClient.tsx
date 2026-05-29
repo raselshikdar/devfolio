@@ -412,6 +412,8 @@ export default function PortfolioPage() {
   const [blogPosts, setBlogPosts] = useState(FALLBACK_BLOG_POSTS);
   const [storeProducts, setStoreProducts] = useState(FALLBACK_STORE_ITEMS);
   const [socialLinks, setSocialLinks] = useState(FALLBACK_SOCIAL_LINKS);
+  const [welcomePopup, setWelcomePopup] = useState<any>(null);
+  const [popupDismissed, setPopupDismissed] = useState(false);
 
   /* ─── Derived: top 4 gallery images for homepage ─── */
   const homepageGalleryImages = galleryImages.slice(0, 4);
@@ -440,6 +442,7 @@ export default function PortfolioPage() {
         if (data.blogPosts?.length) setBlogPosts(data.blogPosts);
         if (data.storeProducts?.length) setStoreProducts(data.storeProducts);
         if (data.socialLinks?.length) setSocialLinks(data.socialLinks);
+        if (data.welcomePopup) setWelcomePopup(data.welcomePopup);
       } catch {
         // Keep fallback data on error
       }
@@ -528,11 +531,88 @@ export default function PortfolioPage() {
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
   const toggleTheme = () => setTheme(theme === "dark" ? "light" : "dark");
 
+  /* ─── Check localStorage for dismissed popup ─── */
+  useEffect(() => {
+    if (welcomePopup?.showOnce && welcomePopup?.id) {
+      const dismissed = localStorage.getItem(`popup_dismissed_${welcomePopup.id}`);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      if (dismissed) setPopupDismissed(true);
+    }
+  }, [welcomePopup]);
+
   /* ─── Derived: social links split into two rows ─── */
   const socialRow1 = socialLinks.slice(0, 4);
   const socialRow2 = socialLinks.slice(4, 7);
 
   return (
+    <>
+    {/* ─── Welcome Popup ─── */}
+    <AnimatePresence>
+      {welcomePopup && welcomePopup.enabled && !popupDismissed && mounted && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+          onClick={() => {
+            setPopupDismissed(true);
+            if (welcomePopup.showOnce && welcomePopup.id) {
+              localStorage.setItem(`popup_dismissed_${welcomePopup.id}`, "true");
+            }
+          }}
+        >
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0, y: 20 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0.9, opacity: 0, y: 20 }}
+            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+            className="relative w-full max-w-md bg-card border border-border rounded-2xl shadow-2xl overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close button */}
+            <button
+              onClick={() => {
+                setPopupDismissed(true);
+                if (welcomePopup.showOnce && welcomePopup.id) {
+                  localStorage.setItem(`popup_dismissed_${welcomePopup.id}`, "true");
+                }
+              }}
+              className="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-background/80 backdrop-blur-sm border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-emerald transition-colors"
+              aria-label="Close popup"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            {/* Image */}
+            {welcomePopup.imageUrl && (
+              <div className="w-full aspect-[2/1] overflow-hidden">
+                <img src={welcomePopup.imageUrl} alt={welcomePopup.title} className="w-full h-full object-cover" />
+              </div>
+            )}
+
+            {/* Content */}
+            <div className="p-6 text-center">
+              <h2 className="text-xl font-bold text-foreground">{welcomePopup.title}</h2>
+              {welcomePopup.message && (
+                <p className="mt-3 text-sm text-muted-foreground leading-relaxed whitespace-pre-line">{welcomePopup.message}</p>
+              )}
+              {welcomePopup.buttonText && welcomePopup.buttonUrl && (
+                <a
+                  href={welcomePopup.buttonUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 mt-5 px-6 py-2.5 rounded-xl bg-emerald text-white text-sm font-semibold hover:bg-emerald-hover transition-colors shadow-sm"
+                >
+                  {welcomePopup.buttonText}
+                  <ArrowRight className="w-4 h-4" />
+                </a>
+              )}
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+
     <div className="dot-pattern min-h-screen flex flex-col">
       {/* ─── Navbar ─── */}
       <header className="sticky top-0 z-50 backdrop-blur-md bg-background/80 border-b border-border">
@@ -972,9 +1052,20 @@ export default function PortfolioPage() {
                         <h3 className="text-sm font-semibold text-foreground">{item.name}</h3>
                         <span className="text-xs text-emerald font-bold">{item.price}</span>
                       </div>
-                      <button className="px-3 py-1.5 rounded-lg bg-emerald text-white text-xs font-semibold hover:bg-emerald-hover transition-colors">
-                        Buy Now
-                      </button>
+                      {item.buyUrl ? (
+                        <a
+                          href={item.buyUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-3 py-1.5 rounded-lg bg-emerald text-white text-xs font-semibold hover:bg-emerald-hover transition-colors inline-flex items-center gap-1"
+                        >
+                          Buy Now <ExternalLink className="w-3 h-3" />
+                        </a>
+                      ) : (
+                        <button className="px-3 py-1.5 rounded-lg bg-emerald text-white text-xs font-semibold hover:bg-emerald-hover transition-colors">
+                          Buy Now
+                        </button>
+                      )}
                     </div>
                   </CardShell>
                 </FadeIn>
@@ -1080,5 +1171,6 @@ export default function PortfolioPage() {
         )}
       </AnimatePresence>
     </div>
+    </>
   );
 }

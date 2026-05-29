@@ -77,13 +77,14 @@ interface AdminData {
   messages: any[];
   guestbookEntries: any[];
   socialLinks: any[];
+  welcomePopups: any[];
 }
 
 type Section =
   | "overview" | "profile" | "education" | "experience" | "skills"
   | "projects" | "gallery" | "audio" | "video"
   | "notes" | "quotes" | "codes" | "links"
-  | "blog" | "store" | "messages" | "guestbook" | "social";
+  | "blog" | "store" | "messages" | "guestbook" | "social" | "popup";
 
 type FieldType =
   | "text" | "textarea" | "number" | "image" | "html"
@@ -116,6 +117,7 @@ const SECTIONS: { key: Section; label: string; icon: React.ElementType; group?: 
   { key: "social", label: "Social Links", icon: Share2, group: "More" },
   { key: "messages", label: "Messages", icon: Mail, group: "Interactions" },
   { key: "guestbook", label: "Guestbook", icon: MessageSquare, group: "Interactions" },
+  { key: "popup", label: "Welcome Popup", icon: Sparkles, group: "Content" },
 ];
 
 const SECTION_FIELDS: Record<string, FieldConfig[]> = {
@@ -200,6 +202,22 @@ const SECTION_FIELDS: Record<string, FieldConfig[]> = {
     { key: "description", label: "Description", type: "textarea" },
     { key: "category", label: "Category", type: "category" },
     { key: "rating", label: "Rating", type: "number" },
+    { key: "buyUrl", label: "Buy Button URL (custom link)" },
+    { key: "featured", label: "Featured Product", type: "checkbox" },
+  ],
+  guestbook: [
+    { key: "name", label: "Name" },
+    { key: "location", label: "Location" },
+    { key: "message", label: "Message", type: "textarea" },
+  ],
+  popup: [
+    { key: "title", label: "Popup Title" },
+    { key: "message", label: "Message", type: "textarea" },
+    { key: "imageUrl", label: "Image", type: "image" },
+    { key: "buttonText", label: "Button Text" },
+    { key: "buttonUrl", label: "Button URL" },
+    { key: "enabled", label: "Enabled", type: "checkbox" },
+    { key: "showOnce", label: "Show Only Once (remember dismissal)", type: "checkbox" },
   ],
   social: [
     { key: "platform", label: "Platform", type: "select", options: [
@@ -232,6 +250,8 @@ const SECTION_API: Record<string, string> = {
   blog: "/api/admin/blog",
   store: "/api/admin/store",
   social: "/api/admin/social",
+  guestbook: "/api/admin/guestbook",
+  popup: "/api/admin/popup",
 };
 
 const DATA_KEY_MAP: Record<string, string> = {
@@ -249,6 +269,8 @@ const DATA_KEY_MAP: Record<string, string> = {
   blog: "blogPosts",
   store: "storeProducts",
   social: "socialLinks",
+  guestbook: "guestbookEntries",
+  popup: "welcomePopups",
 };
 
 /* ─── Utility: cn helper ─── */

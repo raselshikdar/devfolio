@@ -145,6 +145,7 @@ model StoreProduct {
   description       String?
   category          String?
   rating            Float?
+  buyUrl            String?
   hidden            Boolean  @default(false)
   order             Int      @default(0)
   createdAt         DateTime @default(now())
@@ -233,4 +234,17 @@ model GuestbookEntry {
   hidden    Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model WelcomePopup {
+  id          String   @id @default(cuid())
+  title       String   @default("Welcome!")
+  message     String   @default("")
+  imageUrl    String?
+  buttonText  String?
+  buttonUrl   String?
+  enabled     Boolean  @default(true)
+  showOnce    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
