@@ -693,37 +693,46 @@ export default function PortfolioPage() {
           <FadeIn className="h-full">
             <CardShell className="p-6 md:p-8 h-full relative overflow-hidden">
               <ParticleNetwork className="absolute inset-0" />
-              <div className="relative z-10 flex flex-col md:flex-row items-center gap-6">
-                <div className="flex-1 text-center md:text-left">
-                  <h1 className="text-3xl md:text-4xl font-bold text-foreground leading-tight">
-                    Hi, I&apos;m <span className="text-emerald">{profile.name}</span>
-                  </h1>
-                  <p className="mt-2 text-muted-foreground text-sm md:text-base">
-                    {profile.tagline}
-                  </p>
-                  <div className="mt-4 flex flex-wrap gap-3 justify-center md:justify-start">
-                    <a href="#contact" className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald text-white text-sm font-semibold hover:bg-emerald-hover transition-colors shadow-sm">
-                      <Mail className="w-4 h-4" /> Contact Me
-                    </a>
-                    {profile.resume && (
-                      <a href={profile.resume} className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-emerald text-emerald text-sm font-semibold hover:bg-emerald/5 transition-colors">
-                        <Download className="w-4 h-4" /> Download CV
-                      </a>
-                    )}
-                    {!profile.resume && (
-                      <a href="#" className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-emerald text-emerald text-sm font-semibold hover:bg-emerald/5 transition-colors">
-                        <Download className="w-4 h-4" /> Download CV
-                      </a>
-                    )}
-                  </div>
-                </div>
+              <div className="relative z-10 flex flex-col items-center text-center gap-4 py-4">
+                {/* Profile Image — 25% larger */}
                 <div className="shrink-0">
                   <LivePodcastRing>
-                    <div className="w-28 h-28 md:w-36 md:h-36 rounded-full border-2 border-emerald/30 overflow-hidden shadow-md">
-                      <img src={profile.avatar || "https://picsum.photos/seed/avatar42/300/300"} alt={`${profile.name} profile photo`} className="w-full h-full object-cover" />
+                    <div className="w-[140px] h-[140px] md:w-[180px] md:h-[180px] rounded-full border-2 border-emerald/30 overflow-hidden shadow-lg shadow-emerald/10">
+                      <img
+                        src={profile.avatar || "https://picsum.photos/seed/avatar42/300/300"}
+                        alt={`${profile.name} profile photo`}
+                        className="w-full h-full object-cover"
+                      />
                     </div>
                   </LivePodcastRing>
                 </div>
+
+                {/* Title & Subtitle */}
+                <div>
+                  <h1 className="text-3xl md:text-4xl font-bold text-foreground leading-tight">
+                    Hi, I&apos;m <span className="text-emerald">{profile.name}</span>
+                  </h1>
+                  <p className="mt-1.5 text-lg md:text-xl font-medium text-muted-foreground">
+                    Full-Stack Developer
+                  </p>
+                </div>
+
+                {/* Available for Colab — Active status indicator */}
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald/10 border border-emerald/20">
+                  <span className="relative flex h-2.5 w-2.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald opacity-75" />
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald" />
+                  </span>
+                  <span className="text-sm font-medium text-emerald">Available for Colab</span>
+                </div>
+
+                {/* Contact Me button */}
+                <a
+                  href="#contact"
+                  className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-emerald text-white text-sm font-semibold hover:bg-emerald-hover transition-colors shadow-sm shadow-emerald/20"
+                >
+                  <Mail className="w-4 h-4" /> Contact Me
+                </a>
               </div>
             </CardShell>
           </FadeIn>
