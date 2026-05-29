@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useTheme } from "next-themes";
 import { motion, AnimatePresence, useInView } from "framer-motion";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import {
   Menu,
   X,
@@ -37,6 +38,12 @@ import {
   StickyNote,
   BarChart3,
 } from "lucide-react";
+
+// Dynamically import podcast ring to avoid SSR issues
+const LivePodcastRing = dynamic(
+  () => import("@/components/LivePodcastRing"),
+  { ssr: false }
+);
 
 /* ──────────────────────── Fallback Data ──────────────────────── */
 
@@ -706,9 +713,11 @@ export default function PortfolioPage() {
                   </div>
                 </div>
                 <div className="shrink-0">
-                  <div className="w-28 h-28 md:w-36 md:h-36 rounded-full border-2 border-emerald/30 overflow-hidden shadow-md">
-                    <img src={profile.avatar || "https://picsum.photos/seed/avatar42/300/300"} alt={`${profile.name} profile photo`} className="w-full h-full object-cover" />
-                  </div>
+                  <LivePodcastRing>
+                    <div className="w-28 h-28 md:w-36 md:h-36 rounded-full border-2 border-emerald/30 overflow-hidden shadow-md">
+                      <img src={profile.avatar || "https://picsum.photos/seed/avatar42/300/300"} alt={`${profile.name} profile photo`} className="w-full h-full object-cover" />
+                    </div>
+                  </LivePodcastRing>
                 </div>
               </div>
             </CardShell>

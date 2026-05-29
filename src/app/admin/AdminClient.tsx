@@ -14,7 +14,7 @@ import {
   Bold, Italic, Heading2, Heading3, List, ListOrdered, Code, Quote as QuoteIcon,
   LayoutDashboard, Search, RefreshCw, ArrowUp, ArrowDown, Loader2,
   ExternalLink, Clock, Users, FolderOpen, Tag, ChevronDown, Menu,
-  Globe, Phone, MapPin, Mail as MailIcon, Sparkles,
+  Globe, Phone, MapPin, Mail as MailIcon, Sparkles, Radio,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -78,13 +78,14 @@ interface AdminData {
   guestbookEntries: any[];
   socialLinks: any[];
   welcomePopups: any[];
+  livePodcast: any;
 }
 
 type Section =
   | "overview" | "profile" | "education" | "experience" | "skills"
   | "projects" | "gallery" | "audio" | "video"
   | "notes" | "quotes" | "codes" | "links"
-  | "blog" | "store" | "messages" | "guestbook" | "social" | "popup";
+  | "blog" | "store" | "messages" | "guestbook" | "social" | "popup" | "podcast";
 
 type FieldType =
   | "text" | "textarea" | "number" | "image" | "html"
@@ -118,6 +119,7 @@ const SECTIONS: { key: Section; label: string; icon: React.ElementType; group?: 
   { key: "messages", label: "Messages", icon: Mail, group: "Interactions" },
   { key: "guestbook", label: "Guestbook", icon: MessageSquare, group: "Interactions" },
   { key: "popup", label: "Welcome Popup", icon: Sparkles, group: "Content" },
+  { key: "podcast", label: "Live Podcast", icon: Radio, group: "Media" },
 ];
 
 const SECTION_FIELDS: Record<string, FieldConfig[]> = {
@@ -1783,6 +1785,296 @@ function LoginPage({ onLogin }: { onLogin: () => void }) {
   );
 }
 
+/* ─── Live Podcast Section ─── */
+function PodcastSection({
+  podcast,
+  onRefresh,
+}: {
+  podcast: any;
+  onRefresh: () => void;
+}) {
+  const [form, setForm] = useState<Record<string, any>>(() => ({
+    ...(podcast || { title: "Live Podcast", streamUrl: "", sourceType: "custom", isActive: false, status: "offline", description: "" }),
+  }));
+  const [saving, setSaving] = useState(false);
+  const [togglingLive, setTogglingLive] = useState(false);
+
+  const podcastStr = JSON.stringify(podcast);
+  useEffect(() => {
+    if (podcast) {
+      queueMicrotask(() => setForm({ ...podcast }));
+    }
+  }, [podcastStr]);
+
+  const updateField = (key: string, val: any) => {
+    setForm((prev) => ({ ...prev, [key]: val }));
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const res = await fetch("/api/admin/podcast", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: form.id,
+          title: form.title,
+          streamUrl: form.streamUrl || null,
+          sourceType: form.sourceType || "custom",
+          description: form.description || null,
+          status: form.status || "offline",
+        }),
+      });
+      if (res.ok) {
+        toast.success("Podcast settings saved");
+        onRefresh();
+      } else {
+        const data = await res.json();
+        toast.error(data.error || "Save failed");
+      }
+    } catch {
+      toast.error("Network error");
+    }
+    setSaving(false);
+  };
+
+  const toggleLive = async () => {
+    setTogglingLive(true);
+    try {
+      const newIsActive = !form.isActive;
+      const res = await fetch("/api/admin/podcast", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: form.id,
+          isActive: newIsActive,
+          status: newIsActive ? "live" : "offline",
+        }),
+      });
+      if (res.ok) {
+        toast.success(newIsActive ? "Podcast is now LIVE!" : "Podcast stopped");
+        setForm((prev: Record<string, any>) => ({ ...prev, isActive: newIsActive, status: newIsActive ? "live" : "offline" }));
+        onRefresh();
+      } else {
+        toast.error("Toggle failed");
+      }
+    } catch {
+      toast.error("Network error");
+    }
+    setTogglingLive(false);
+  };
+
+  const isLive = !!form.isActive;
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <h3 className="text-lg font-semibold">Live Podcast</h3>
+          {isLive ? (
+            <Badge className="bg-red-500/15 text-red-600 border-red-500/30 animate-pulse">
+              <span className="mr-1">●</span> LIVE
+            </Badge>
+          ) : (
+            <Badge variant="outline" className="text-muted-foreground">
+              OFFLINE
+            </Badge>
+          )}
+        </div>
+        <Button
+          onClick={toggleLive}
+          disabled={togglingLive}
+          className={cn(
+            "transition-colors",
+            isLive
+              ? "bg-red-600 hover:bg-red-700 text-white"
+              : "bg-emerald-600 hover:bg-emerald-700 text-white"
+          )}
+        >
+          {togglingLive ? (
+            <Loader2 className="w-4 h-4 animate-spin mr-1" />
+          ) : isLive ? (
+            <span className="w-2 h-2 rounded-full bg-white mr-2" />
+          ) : (
+            <Radio className="w-4 h-4 mr-1" />
+          )}
+          {togglingLive ? "Updating..." : isLive ? "Stop Live" : "Go Live"}
+        </Button>
+      </div>
+
+      {/* Status Card */}
+      <Card className={cn("border-2 transition-colors", isLive ? "border-red-500/30 bg-red-500/5" : "border-border")}>
+        <CardHeader>
+          <CardTitle className="text-sm flex items-center gap-2">
+            <Radio className="w-4 h-4" />
+            Stream Status
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center gap-4">
+            <div className={cn(
+              "w-16 h-16 rounded-2xl flex items-center justify-center",
+              isLive ? "bg-red-500/10" : "bg-muted"
+            )}>
+              {isLive ? (
+                <div className="flex items-end gap-1">
+                  {[0, 1, 2, 3].map((i) => (
+                    <motion.div
+                      key={i}
+                      className="w-1.5 rounded-full bg-red-500"
+                      animate={{ height: ["8px", "24px", "12px", "28px", "8px"] }}
+                      transition={{ duration: 0.6 + i * 0.1, repeat: Infinity, repeatType: "reverse" }}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <Radio className="w-6 h-6 text-muted-foreground" />
+              )}
+            </div>
+            <div>
+              <p className="font-semibold text-sm">{isLive ? "Stream is Live" : "Stream is Offline"}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {isLive
+                  ? "Listeners can tune in on the homepage"
+                  : "Configure settings below, then click Go Live to start streaming"}
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Settings Form */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-sm">Stream Settings</CardTitle>
+          <CardDescription>Configure the audio stream source and podcast details</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-1.5">
+            <Label className="text-sm font-medium">Podcast Title</Label>
+            <Input
+              type="text"
+              value={form.title || ""}
+              onChange={(e) => updateField("title", e.target.value)}
+              placeholder="e.g. Tech Talk Live"
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label className="text-sm font-medium">Stream URL</Label>
+            <Input
+              type="text"
+              value={form.streamUrl || ""}
+              onChange={(e) => updateField("streamUrl", e.target.value)}
+              placeholder="e.g. https://vdo.ninja/?view=xxxxx or direct audio stream URL"
+            />
+            <p className="text-[11px] text-muted-foreground">
+              Supports VDO.Ninja links, direct audio stream URLs, Icecast/Shoutcast endpoints, and other live audio sources
+            </p>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label className="text-sm font-medium">Source Type</Label>
+            <Select value={form.sourceType || "custom"} onValueChange={(val) => updateField("sourceType", val)}>
+              <SelectTrigger><SelectValue placeholder="Select source type" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="vdoninja">VDO.Ninja</SelectItem>
+                <SelectItem value="icecast">Icecast / Shoutcast</SelectItem>
+                <SelectItem value="podcast">Podcast Feed</SelectItem>
+                <SelectItem value="custom">Custom Audio URL</SelectItem>
+                <SelectItem value="other">Other</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label className="text-sm font-medium">Description (optional)</Label>
+            <Textarea
+              rows={3}
+              value={form.description || ""}
+              onChange={(e) => updateField("description", e.target.value)}
+              placeholder="What is this podcast about?"
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label className="text-sm font-medium">Status Override</Label>
+            <Select value={form.status || "offline"} onValueChange={(val) => updateField("status", val)}>
+              <SelectTrigger><SelectValue placeholder="Select status" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="offline">Offline</SelectItem>
+                <SelectItem value="live">Live</SelectItem>
+                <SelectItem value="starting">Starting Soon</SelectItem>
+                <SelectItem value="paused">Paused</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <Button onClick={handleSave} disabled={saving} className="bg-emerald-600 hover:bg-emerald-700 w-full">
+            {saving ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <Save className="w-4 h-4 mr-1" />}
+            {saving ? "Saving..." : "Save Settings"}
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* Quick Actions */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-sm">Quick Actions</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 gap-3">
+            <Button
+              variant="outline"
+              className="w-full h-auto py-3 flex-col gap-1"
+              onClick={() => {
+                updateField("status", "starting");
+                handleSave();
+              }}
+            >
+              <Clock className="w-4 h-4 text-yellow-500" />
+              <span className="text-xs">Set Starting Soon</span>
+            </Button>
+            <Button
+              variant="outline"
+              className="w-full h-auto py-3 flex-col gap-1"
+              onClick={() => {
+                updateField("status", "paused");
+                handleSave();
+              }}
+            >
+              <span className="text-xs">Set Paused</span>
+            </Button>
+            <Button
+              variant="outline"
+              className="w-full h-auto py-3 flex-col gap-1"
+              onClick={() => {
+                updateField("isActive", true);
+                updateField("status", "live");
+                toggleLive();
+              }}
+            >
+              <Radio className="w-4 h-4 text-emerald-500" />
+              <span className="text-xs">Go Live Now</span>
+            </Button>
+            <Button
+              variant="outline"
+              className="w-full h-auto py-3 flex-col gap-1 hover:border-red-500/30 hover:text-red-600"
+              onClick={() => {
+                updateField("isActive", false);
+                updateField("status", "offline");
+                toggleLive();
+              }}
+            >
+              <span className="text-xs">End Stream</span>
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
 /* ─── Dashboard Layout ─── */
 function Dashboard({
   data,
@@ -1833,6 +2125,8 @@ function Dashboard({
         return <MessagesSection messages={data.messages} onRefresh={onRefresh} />;
       case "guestbook":
         return <GuestbookSection entries={data.guestbookEntries} onRefresh={onRefresh} />;
+      case "podcast":
+        return <PodcastSection podcast={data.livePodcast} onRefresh={onRefresh} />;
       default: {
         const fields = SECTION_FIELDS[activeSection];
         const apiPath = SECTION_API[activeSection];

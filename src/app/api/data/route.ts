@@ -22,6 +22,7 @@ export async function GET() {
       links,
       guestbookEntries,
       welcomePopup,
+      livePodcast,
     ] = await Promise.all([
       db.profile.findFirst({ where: { hidden: false } }),
       db.education.findMany({ where: { hidden: false }, orderBy: { order: "asc" } }),
@@ -40,6 +41,7 @@ export async function GET() {
       db.link.findMany({ where: { hidden: false }, orderBy: { order: "asc" } }),
       db.guestbookEntry.findMany({ where: { hidden: false }, orderBy: { createdAt: "desc" } }),
       db.welcomePopup.findFirst({ where: { enabled: true } }),
+      db.livePodcast.findFirst(),
     ]);
 
     return NextResponse.json({
@@ -60,11 +62,20 @@ export async function GET() {
       links,
       guestbookEntries,
       welcomePopup,
+      livePodcast: livePodcast
+        ? {
+            isLive: livePodcast.isActive,
+            title: livePodcast.title,
+            streamUrl: livePodcast.streamUrl,
+            status: livePodcast.status,
+            description: livePodcast.description,
+          }
+        : { isLive: false, title: null, streamUrl: null, status: "offline", description: null },
     });
   } catch (error) {
     console.error("[/api/data] Database query failed:", error);
     return NextResponse.json(
-      { error: "Failed to fetch data", profile: null, education: [], experience: [], skills: [], projects: [], galleryImages: [], notes: [], quotes: [], blogPosts: [], storeProducts: [], socialLinks: [], audio: [], video: [], code: [], links: [], guestbookEntries: [], welcomePopup: null },
+      { error: "Failed to fetch data", profile: null, education: [], experience: [], skills: [], projects: [], galleryImages: [], notes: [], quotes: [], blogPosts: [], storeProducts: [], socialLinks: [], audio: [], video: [], code: [], links: [], guestbookEntries: [], welcomePopup: null, livePodcast: { isLive: false, title: null, streamUrl: null, status: "offline", description: null } },
       { status: 500 }
     );
   }

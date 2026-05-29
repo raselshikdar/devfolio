@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "next-themes";
+import PodcastShell from "@/components/PodcastShell";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -42,7 +43,9 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <PodcastShell>
+            {children}
+          </PodcastShell>
           <Toaster />
         </ThemeProvider>
       </body>
