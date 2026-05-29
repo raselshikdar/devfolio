@@ -7,27 +7,36 @@ function verifyAuth(req: NextRequest): boolean {
   try { return atob(token).includes(":"); } catch { return false; }
 }
 
-export async function POST(req: NextRequest) {
+// GET - list comments (optionally filter by blogPostId)
+export async function GET(req: NextRequest) {
   if (!verifyAuth(req)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const data = await req.json();
-  const item = await db.storeProduct.create({ data: { name: data.name, price: data.price || "", image: data.image || null, featuredImage: data.featuredImage || null, description: data.description || null, category: data.category || null, rating: data.rating || null, buyUrl: data.buyUrl || null, featured: data.featured || false, hidden: data.hidden || false, order: data.order || 0 } });
-  return NextResponse.json(item);
+  const { searchParams } = new URL(req.url);
+  const blogPostId = searchParams.get("blogPostId");
+  const where = blogPostId ? { blogPostId } : {};
+  const comments = await db.blogComment.findMany({
+    where,
+    orderBy: { createdAt: "desc" },
+    include: { blogPost: { select: { title: true } } },
+  });
+  return NextResponse.json(comments);
 }
 
+// PUT - update comment (e.g., hide/unhide)
 export async function PUT(req: NextRequest) {
   if (!verifyAuth(req)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const data = await req.json();
   const { id, ...updateData } = data;
   if (!id) return NextResponse.json({ error: "ID required" }, { status: 400 });
-  const item = await db.storeProduct.update({ where: { id }, data: updateData });
+  const item = await db.blogComment.update({ where: { id }, data: updateData });
   return NextResponse.json(item);
 }
 
+// DELETE - delete comment
 export async function DELETE(req: NextRequest) {
   if (!verifyAuth(req)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const { searchParams } = new URL(req.url);
   const id = searchParams.get("id");
   if (!id) return NextResponse.json({ error: "ID required" }, { status: 400 });
-  await db.storeProduct.delete({ where: { id } });
+  await db.blogComment.delete({ where: { id } });
   return NextResponse.json({ success: true });
 }

@@ -45,18 +45,21 @@ const LivePodcastRing = dynamic(
   { ssr: false }
 );
 
+// Dynamically import particle network for hero animation
+const ParticleNetwork = dynamic(
+  () => import("@/components/ParticleNetwork"),
+  { ssr: false }
+);
+
 /* ──────────────────────── Fallback Data ──────────────────────── */
 
 const NAV_LINKS = [
-  { label: "About", href: "#about" },
-  { label: "Education", href: "#education" },
-  { label: "Experience", href: "#experience" },
-  { label: "Gallery", href: "#gallery" },
-  { label: "Skills", href: "#skills" },
-  { label: "Projects", href: "#projects" },
-  { label: "Blog", href: "#blog" },
-  { label: "Store", href: "#store" },
-  { label: "Contact", href: "#contact" },
+  { label: "Home", href: "#" },
+  { label: "Projects", href: "/projects" },
+  { label: "Blog", href: "/blog" },
+  { label: "Gallery", href: "/gallery" },
+  { label: "Store", href: "/store" },
+  { label: "Contact", href: "/contact" },
 ];
 
 const FALLBACK_EDUCATION = [
@@ -251,7 +254,7 @@ function CardShell({ children, className = "", id }: { children: React.ReactNode
 function useCountUp(end: number, duration = 1400, started = false) {
   const [count, setCount] = useState(0);
   useEffect(() => {
-    if (!started) { setCount(0); return; }
+    if (!started) return;
     let frame: number;
     const startTime = performance.now();
     const step = (now: number) => {
@@ -688,8 +691,9 @@ export default function PortfolioPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* ─── Hero ─── */}
           <FadeIn className="h-full">
-            <CardShell className="p-6 md:p-8 h-full">
-              <div className="flex flex-col md:flex-row items-center gap-6">
+            <CardShell className="p-6 md:p-8 h-full relative overflow-hidden">
+              <ParticleNetwork className="absolute inset-0" />
+              <div className="relative z-10 flex flex-col md:flex-row items-center gap-6">
                 <div className="flex-1 text-center md:text-left">
                   <h1 className="text-3xl md:text-4xl font-bold text-foreground leading-tight">
                     Hi, I&apos;m <span className="text-emerald">{profile.name}</span>
@@ -985,7 +989,8 @@ export default function PortfolioPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {homepageProjects.map((p, i) => (
                 <FadeIn key={p.id} delay={i * 0.08} className={i >= 3 ? "md:hidden" : ""}>
-                  <CardShell className="overflow-hidden h-full flex flex-col">
+                  <Link href={`/projects/${p.id}`}>
+                  <CardShell className="overflow-hidden h-full flex flex-col cursor-pointer">
                     <div className="aspect-[16/9] overflow-hidden">
                       <img src={resolveImage(p)} alt={p.name} className="w-full h-full object-cover transition-transform duration-300 hover:scale-105" loading="lazy" />
                     </div>
@@ -999,18 +1004,19 @@ export default function PortfolioPage() {
                       </div>
                       <div className="flex gap-3 mt-3">
                         {p.demoUrl && (
-                          <a href={p.demoUrl} className="inline-flex items-center gap-1 text-xs font-medium text-emerald hover:underline">
+                          <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald">
                             <ExternalLink className="w-3 h-3" /> Live Demo
-                          </a>
+                          </span>
                         )}
                         {p.githubUrl && (
-                          <a href={p.githubUrl} className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-emerald transition-colors">
+                          <span className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground">
                             <Github className="w-3 h-3" /> GitHub
-                          </a>
+                          </span>
                         )}
                       </div>
                     </div>
                   </CardShell>
+                  </Link>
                 </FadeIn>
               ))}
             </div>
@@ -1035,9 +1041,9 @@ export default function PortfolioPage() {
                         <span className="text-[10px] text-muted-foreground">{post.date}</span>
                       </div>
                       <p className="text-xs text-muted-foreground mt-2 flex-1">{post.excerpt}</p>
-                      <a href="#" className="inline-flex items-center gap-1 text-xs font-medium text-emerald mt-3 hover:underline">
+                      <Link href={`/blog/${post.id}`} className="inline-flex items-center gap-1 text-xs font-medium text-emerald mt-3 hover:underline">
                         Read More <ChevronRight className="w-3 h-3" />
-                      </a>
+                      </Link>
                     </div>
                   </CardShell>
                 </FadeIn>
@@ -1053,7 +1059,8 @@ export default function PortfolioPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {storeProducts.map((item, i) => (
                 <FadeIn key={item.id} delay={i * 0.08}>
-                  <CardShell className="overflow-hidden">
+                  <Link href={`/store/${item.id}`}>
+                  <CardShell className="overflow-hidden cursor-pointer">
                     <div className="aspect-[3/2] overflow-hidden">
                       <img src={resolveImage(item)} alt={item.name} className="w-full h-full object-cover" loading="lazy" />
                     </div>
@@ -1062,22 +1069,12 @@ export default function PortfolioPage() {
                         <h3 className="text-sm font-semibold text-foreground">{item.name}</h3>
                         <span className="text-xs text-emerald font-bold">{item.price}</span>
                       </div>
-                      {item.buyUrl ? (
-                        <a
-                          href={item.buyUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="px-3 py-1.5 rounded-lg bg-emerald text-white text-xs font-semibold hover:bg-emerald-hover transition-colors inline-flex items-center gap-1"
-                        >
-                          Buy Now <ExternalLink className="w-3 h-3" />
-                        </a>
-                      ) : (
-                        <button className="px-3 py-1.5 rounded-lg bg-emerald text-white text-xs font-semibold hover:bg-emerald-hover transition-colors">
-                          Buy Now
-                        </button>
-                      )}
+                      <span className="px-3 py-1.5 rounded-lg bg-emerald text-white text-xs font-semibold hover:bg-emerald-hover transition-colors inline-flex items-center gap-1">
+                        View <ExternalLink className="w-3 h-3" />
+                      </span>
                     </div>
                   </CardShell>
+                  </Link>
                 </FadeIn>
               ))}
             </div>

@@ -38,6 +38,7 @@ export async function GET(req: NextRequest) {
     guestbookEntries,
     welcomePopups,
     livePodcast,
+    blogComments,
   ] = await Promise.all([
     db.profile.findFirst(),
     db.education.findMany({ orderBy: { order: "asc" } }),
@@ -58,6 +59,7 @@ export async function GET(req: NextRequest) {
     db.guestbookEntry.findMany({ orderBy: { createdAt: "desc" } }),
     db.welcomePopup.findMany({ orderBy: { createdAt: "desc" } }),
     db.livePodcast.findFirst(),
+    db.blogComment.findMany({ orderBy: { createdAt: "desc" }, include: { blogPost: { select: { title: true } } } }),
   ]);
 
   return NextResponse.json({
@@ -80,5 +82,6 @@ export async function GET(req: NextRequest) {
     guestbookEntries,
     welcomePopups,
     livePodcast,
+    blogComments,
   });
 }

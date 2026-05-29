@@ -15,6 +15,7 @@ import {
   Search,
   SlidersHorizontal,
   Folder,
+  ChevronRight,
 } from "lucide-react";
 
 /* ─── Types ─── */
@@ -215,6 +216,7 @@ export default function ProjectsPage() {
   const [activeCategory, setActiveCategory] = useState("All");
   const [projects, setProjects] = useState<Project[]>(FALLBACK_PROJECTS);
   const [loading, setLoading] = useState(true);
+  const [profileName, setProfileName] = useState("Rasel Shikdar");
 
   /* ─── Mount ─── */
   useEffect(() => {
@@ -232,6 +234,7 @@ export default function ProjectsPage() {
         if (!res.ok) return;
         const data = await res.json();
         if (data.projects?.length) setProjects(data.projects);
+        if (data.profile?.name) setProfileName(data.profile.name);
       } catch {
         // Keep fallback data on error
       } finally {
@@ -254,7 +257,16 @@ export default function ProjectsPage() {
     ...Array.from(new Set(projects.map((p) => p.category).filter(Boolean))) as string[],
   ];
 
-  const filtered = projects.filter((p) => {
+  // Sort: featured projects first
+  const sortedProjects = [...projects].sort((a, b) => {
+    if (a.featured && !b.featured) return -1;
+    if (!a.featured && b.featured) return 1;
+    return 0;
+  });
+
+  const featuredProject = sortedProjects.find((p) => p.featured);
+
+  const filtered = sortedProjects.filter((p) => {
     const matchSearch =
       p.name.toLowerCase().includes(search.toLowerCase()) ||
       p.description.toLowerCase().includes(search.toLowerCase());
@@ -262,6 +274,11 @@ export default function ProjectsPage() {
       activeCategory === "All" || p.category === activeCategory;
     return matchSearch && matchCategory;
   });
+
+  // In the grid, exclude the featured project if it's shown in the featured section
+  const gridProjects = filtered.filter(
+    (p) => !(featuredProject && p.id === featuredProject.id)
+  );
 
   return (
     <div className="dot-pattern min-h-screen flex flex-col">
@@ -352,6 +369,88 @@ export default function ProjectsPage() {
           </CardShell>
         </FadeIn>
 
+        {/* ─── Featured Project Section ─── */}
+        {featuredProject && (
+          <FadeIn>
+            <div className="mb-2">
+              <div className="flex items-center gap-2 mb-3">
+                <Star className="w-4 h-4 text-emerald fill-emerald" />
+                <h2 className="text-sm font-semibold text-foreground">Featured Project</h2>
+              </div>
+              <Link href={`/projects/${featuredProject.id}`}>
+                <CardShell className="overflow-hidden cursor-pointer">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
+                    {resolveImage(featuredProject) && (
+                      <div className="aspect-[16/9] md:aspect-auto overflow-hidden">
+                        <img
+                          src={resolveImage(featuredProject)}
+                          alt={featuredProject.name}
+                          className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                          loading="lazy"
+                        />
+                      </div>
+                    )}
+                    <div className="p-6 flex flex-col justify-center">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 text-[10px] font-semibold rounded-md bg-emerald/10 text-emerald">
+                          <Star className="w-2.5 h-2.5" /> Featured
+                        </span>
+                        {featuredProject.category && (
+                          <span className="px-2 py-0.5 text-[10px] font-medium text-emerald bg-emerald/10 rounded-md">
+                            {featuredProject.category}
+                          </span>
+                        )}
+                      </div>
+                      <h2 className="text-lg md:text-xl font-bold text-foreground leading-tight">
+                        {featuredProject.name}
+                      </h2>
+                      <p className="text-sm text-muted-foreground mt-2 line-clamp-3">
+                        {featuredProject.description}
+                      </p>
+                      {/* Tags */}
+                      {splitTags(featuredProject.tags).length > 0 && (
+                        <div className="flex flex-wrap gap-1.5 mt-3">
+                          {splitTags(featuredProject.tags).map((t) => (
+                            <span
+                              key={t}
+                              className="px-2 py-0.5 text-[10px] font-medium text-emerald bg-emerald/10 rounded-md"
+                            >
+                              {t}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                      <div className="flex items-center gap-3 mt-4">
+                        <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald hover:underline">
+                          View Details <ChevronRight className="w-3 h-3" />
+                        </span>
+                        {featuredProject.demoUrl && (
+                          <a
+                            href={featuredProject.demoUrl}
+                            className="inline-flex items-center gap-1 text-xs font-medium text-emerald hover:underline"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <ExternalLink className="w-3 h-3" /> Live Demo
+                          </a>
+                        )}
+                        {featuredProject.githubUrl && (
+                          <a
+                            href={featuredProject.githubUrl}
+                            className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-emerald transition-colors"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <Github className="w-3 h-3" /> GitHub
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </CardShell>
+              </Link>
+            </div>
+          </FadeIn>
+        )}
+
         {/* ─── Loading skeleton ─── */}
         {loading && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -379,85 +478,92 @@ export default function ProjectsPage() {
         {/* ─── Projects grid ─── */}
         {!loading && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filtered.map((p, i) => {
+            {gridProjects.map((p, i) => {
               const imgSrc = resolveImage(p);
               const tags = splitTags(p.tags);
               return (
                 <FadeIn key={p.id} delay={i * 0.06}>
-                  <CardShell className="overflow-hidden h-full flex flex-col">
-                    {/* Featured image */}
-                    {imgSrc && (
-                      <div className="aspect-[16/9] overflow-hidden relative group">
-                        <img
-                          src={imgSrc}
-                          alt={p.name}
-                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                          loading="lazy"
-                        />
-                        {/* Overlay gradient */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                        {/* Featured badge */}
-                        {p.featured && (
-                          <span className="absolute top-2 right-2 px-2 py-0.5 text-[10px] font-semibold text-white bg-emerald rounded-md flex items-center gap-1">
-                            <Star className="w-3 h-3" /> Featured
-                          </span>
-                        )}
-                      </div>
-                    )}
-
-                    <div className="p-5 flex flex-col flex-1">
-                      {/* Category badge + title */}
-                      <div className="flex items-start justify-between gap-2">
-                        <h3 className="text-sm font-semibold text-foreground">
-                          {p.name}
-                        </h3>
-                        {p.category && (
-                          <span className="px-2 py-0.5 text-[10px] font-medium text-emerald bg-emerald/10 rounded-md whitespace-nowrap shrink-0">
-                            {p.category}
-                          </span>
-                        )}
-                      </div>
-
-                      {/* Description */}
-                      <p className="text-xs text-muted-foreground mt-1.5 flex-1">
-                        {p.description}
-                      </p>
-
-                      {/* Tags as emerald pills */}
-                      {tags.length > 0 && (
-                        <div className="flex flex-wrap gap-1.5 mt-3">
-                          {tags.map((t) => (
-                            <span
-                              key={t}
-                              className="px-2 py-0.5 text-[10px] font-medium text-emerald bg-emerald/10 rounded-md"
-                            >
-                              {t}
+                  <Link href={`/projects/${p.id}`}>
+                    <CardShell className="overflow-hidden h-full flex flex-col cursor-pointer">
+                      {/* Featured image */}
+                      {imgSrc && (
+                        <div className="aspect-[16/9] overflow-hidden relative group">
+                          <img
+                            src={imgSrc}
+                            alt={p.name}
+                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                            loading="lazy"
+                          />
+                          {/* Overlay gradient */}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                          {/* Featured badge */}
+                          {p.featured && (
+                            <span className="absolute top-2 right-2 px-2 py-0.5 text-[10px] font-semibold text-white bg-emerald rounded-md flex items-center gap-1">
+                              <Star className="w-3 h-3" /> Featured
                             </span>
-                          ))}
+                          )}
                         </div>
                       )}
 
-                      {/* Demo + GitHub links */}
-                      <div className="flex gap-3 mt-3 pt-3 border-t border-border">
-                        {p.demoUrl && (
-                          <a
-                            href={p.demoUrl}
-                            className="inline-flex items-center gap-1 text-xs font-medium text-emerald hover:underline"
-                          >
-                            <ExternalLink className="w-3 h-3" /> Live Demo
-                          </a>
+                      <div className="p-5 flex flex-col flex-1">
+                        {/* Category badge + title */}
+                        <div className="flex items-start justify-between gap-2">
+                          <h3 className="text-sm font-semibold text-foreground">
+                            {p.name}
+                          </h3>
+                          {p.category && (
+                            <span className="px-2 py-0.5 text-[10px] font-medium text-emerald bg-emerald/10 rounded-md whitespace-nowrap shrink-0">
+                              {p.category}
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Description */}
+                        <p className="text-xs text-muted-foreground mt-1.5 flex-1">
+                          {p.description}
+                        </p>
+
+                        {/* Tags as emerald pills */}
+                        {tags.length > 0 && (
+                          <div className="flex flex-wrap gap-1.5 mt-3">
+                            {tags.map((t) => (
+                              <span
+                                key={t}
+                                className="px-2 py-0.5 text-[10px] font-medium text-emerald bg-emerald/10 rounded-md"
+                              >
+                                {t}
+                              </span>
+                            ))}
+                          </div>
                         )}
-                        {p.githubUrl && (
-                          <a
-                            href={p.githubUrl}
-                            className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-emerald transition-colors"
-                          >
-                            <Github className="w-3 h-3" /> GitHub
-                          </a>
-                        )}
+
+                        {/* Demo + GitHub links */}
+                        <div className="flex gap-3 mt-3 pt-3 border-t border-border">
+                          {p.demoUrl && (
+                            <a
+                              href={p.demoUrl}
+                              className="inline-flex items-center gap-1 text-xs font-medium text-emerald hover:underline"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <ExternalLink className="w-3 h-3" /> Live Demo
+                            </a>
+                          )}
+                          {p.githubUrl && (
+                            <a
+                              href={p.githubUrl}
+                              className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-emerald transition-colors"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <Github className="w-3 h-3" /> GitHub
+                            </a>
+                          )}
+                          <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald hover:underline ml-auto">
+                            Details <ChevronRight className="w-3 h-3" />
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                  </CardShell>
+                    </CardShell>
+                  </Link>
                 </FadeIn>
               );
             })}
@@ -494,7 +600,7 @@ export default function ProjectsPage() {
       {/* ─── Footer ─── */}
       <footer className="border-t border-border mt-6">
         <div className="max-w-6xl mx-auto px-4 py-5 text-center text-xs text-muted-foreground">
-          &copy; {new Date().getFullYear()} Alex Morgan. All rights reserved.
+          &copy; {new Date().getFullYear()} {profileName}. All rights reserved.
         </div>
       </footer>
 

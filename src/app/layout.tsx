@@ -12,20 +12,65 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Rasel Shikdar — Full-Stack Developer",
+  metadataBase: new URL("https://raselsh.pro.bd"),
+  title: {
+    default: "Rasel Shikdar — Full-Stack Developer",
+    template: "%s | Rasel Shikdar",
+  },
   description:
-    "Personal portfolio of Rasel Shikdar — Full-Stack Developer specializing in modern web technologies, scalable applications, and clean UI/UX.",
+    "Full-Stack Developer building modern, scalable, and high-performance web applications with clean UI/UX and smooth user experiences. 5+ years of experience, 50+ projects completed.",
   keywords: [
-    "portfolio",
-    "developer",
-    "full-stack",
     "Rasel Shikdar",
+    "Full-Stack Developer",
+    "Web Developer",
     "Next.js",
     "React",
+    "TypeScript",
+    "Portfolio",
   ],
-  authors: [{ name: "Rasel Shikdar" }],
+  authors: [{ name: "Rasel Shikdar", url: "https://raselsh.pro.bd" }],
+  creator: "Rasel Shikdar",
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "https://raselsh.pro.bd",
+    siteName: "Rasel Shikdar",
+    title: "Rasel Shikdar — Full-Stack Developer",
+    description:
+      "Full-Stack Developer building modern, scalable, and high-performance web applications with clean UI/UX and smooth user experiences.",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Rasel Shikdar — Full-Stack Developer",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Rasel Shikdar — Full-Stack Developer",
+    description:
+      "Full-Stack Developer building modern, scalable, and high-performance web applications.",
+    images: ["/og-image.png"],
+    creator: "@raselshikdar_",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  alternates: {
+    canonical: "https://raselsh.pro.bd",
+  },
   icons: {
-    icon: "/logo.svg",
+    icon: ["/favicon.png", "/logo.svg"],
   },
 };
 

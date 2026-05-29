@@ -16,6 +16,7 @@ import {
   Tag,
   X,
   FolderOpen,
+  Star,
 } from "lucide-react";
 
 /* ─── Types ─── */
@@ -31,6 +32,7 @@ interface BlogPost {
   tags?: string | null;
   category?: string | null;
   published?: boolean;
+  featured?: boolean;
 }
 
 /* ─── Fallback Data ─── */
@@ -48,6 +50,7 @@ const FALLBACK_POSTS: BlogPost[] = [
     featuredImage: "",
     tags: "Next.js,API,Server Actions",
     category: "Tutorial",
+    featured: true,
   },
   {
     id: "b2",
@@ -61,6 +64,7 @@ const FALLBACK_POSTS: BlogPost[] = [
     featuredImage: "",
     tags: "CSS,Frontend,Design",
     category: "Opinion",
+    featured: true,
   },
   {
     id: "b3",
@@ -74,6 +78,7 @@ const FALLBACK_POSTS: BlogPost[] = [
     featuredImage: "",
     tags: "React,State Management,Zustand",
     category: "Experience",
+    featured: false,
   },
   {
     id: "b4",
@@ -87,6 +92,7 @@ const FALLBACK_POSTS: BlogPost[] = [
     featuredImage: "",
     tags: "TypeScript,Generics,Programming",
     category: "Tutorial",
+    featured: false,
   },
   {
     id: "b5",
@@ -100,6 +106,7 @@ const FALLBACK_POSTS: BlogPost[] = [
     featuredImage: "",
     tags: "Docker,DevOps,Frontend",
     category: "Guide",
+    featured: false,
   },
   {
     id: "b6",
@@ -113,6 +120,7 @@ const FALLBACK_POSTS: BlogPost[] = [
     featuredImage: "",
     tags: "Accessibility,Design,UX",
     category: "Design",
+    featured: false,
   },
   {
     id: "b7",
@@ -126,6 +134,7 @@ const FALLBACK_POSTS: BlogPost[] = [
     featuredImage: "",
     tags: "React,RSC,Performance",
     category: "Deep Dive",
+    featured: false,
   },
   {
     id: "b8",
@@ -139,6 +148,7 @@ const FALLBACK_POSTS: BlogPost[] = [
     featuredImage: "",
     tags: "Productivity,Tools,Developer Experience",
     category: "Listicle",
+    featured: false,
   },
 ];
 
@@ -201,126 +211,6 @@ function CardShell({
   );
 }
 
-/* ─── Blog Detail Modal ─── */
-
-function BlogDetailModal({
-  post,
-  onClose,
-}: {
-  post: BlogPost;
-  onClose: () => void;
-}) {
-  const scrollRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, []);
-
-  useEffect(() => {
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", handleKey);
-    return () => window.removeEventListener("keydown", handleKey);
-  }, [onClose]);
-
-  const postTags = splitTags(post.tags);
-
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.2 }}
-      className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-start justify-center"
-      onClick={onClose}
-    >
-      <motion.div
-        initial={{ opacity: 0, y: 40, scale: 0.97 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        exit={{ opacity: 0, y: 40, scale: 0.97 }}
-        transition={{ duration: 0.25, ease: "easeOut" }}
-        className="relative w-full max-w-3xl max-h-[92vh] m-4 mt-8 rounded-2xl border border-border bg-card shadow-2xl overflow-hidden flex flex-col"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Close button */}
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 z-10 w-9 h-9 rounded-full bg-background/80 backdrop-blur border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-emerald transition-colors"
-          aria-label="Close"
-        >
-          <X className="w-4 h-4" />
-        </button>
-
-        {/* Scrollable content */}
-        <div ref={scrollRef} className="overflow-y-auto flex-1">
-          {/* Featured image */}
-          {resolveImage(post) && (
-            <div className="aspect-[2/1] w-full overflow-hidden">
-              <img
-                src={resolveImage(post)}
-                alt={post.title}
-                className="w-full h-full object-cover"
-              />
-            </div>
-          )}
-
-          {/* Post header */}
-          <div className="p-6 md:p-8 space-y-4">
-            {/* Category badge */}
-            {post.category && (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-semibold rounded-lg bg-emerald/10 text-emerald">
-                <FolderOpen className="w-3 h-3" />
-                {post.category}
-              </span>
-            )}
-
-            <h1 className="text-2xl md:text-3xl font-bold text-foreground leading-tight">
-              {post.title}
-            </h1>
-
-            <div className="flex flex-wrap items-center gap-3">
-              <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
-                <Calendar className="w-3.5 h-3.5" /> {post.date}
-              </span>
-            </div>
-
-            {/* Tags */}
-            {postTags.length > 0 && (
-              <div className="flex flex-wrap gap-1.5">
-                {postTags.map((t) => (
-                  <span
-                    key={t}
-                    className="px-2.5 py-1 text-[11px] font-medium text-emerald bg-emerald/10 rounded-md"
-                  >
-                    {t}
-                  </span>
-                ))}
-              </div>
-            )}
-
-            {/* Divider */}
-            <div className="border-t border-border" />
-
-            {/* HTML Content with prose-like styling */}
-            {post.content ? (
-              <div
-                className="blog-prose"
-                dangerouslySetInnerHTML={{ __html: post.content }}
-              />
-            ) : (
-              <p className="text-sm text-muted-foreground">{post.excerpt}</p>
-            )}
-          </div>
-        </div>
-      </motion.div>
-    </motion.div>
-  );
-}
-
 /* ─── Page ─── */
 
 export default function BlogPage() {
@@ -331,7 +221,7 @@ export default function BlogPage() {
   const [search, setSearch] = useState("");
   const [activeTag, setActiveTag] = useState<string | null>(null);
   const [posts, setPosts] = useState<BlogPost[]>(FALLBACK_POSTS);
-  const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
+  const [profileName, setProfileName] = useState("Rasel Shikdar");
 
   useEffect(() => {
     if (!mountedRef.current) {
@@ -348,6 +238,7 @@ export default function BlogPage() {
         if (!res.ok) return;
         const data = await res.json();
         if (data.blogPosts?.length) setPosts(data.blogPosts);
+        if (data.profile?.name) setProfileName(data.profile.name);
       } catch {
         // Keep fallback data on error
       }
@@ -366,13 +257,27 @@ export default function BlogPage() {
     new Set(posts.flatMap((p) => splitTags(p.tags)))
   );
 
-  const filtered = posts.filter((p) => {
+  // Sort: featured posts first, then by order
+  const sortedPosts = [...posts].sort((a, b) => {
+    if (a.featured && !b.featured) return -1;
+    if (!a.featured && b.featured) return 1;
+    return 0;
+  });
+
+  const featuredPost = sortedPosts.find((p) => p.featured);
+
+  const filtered = sortedPosts.filter((p) => {
     const matchSearch =
       p.title.toLowerCase().includes(search.toLowerCase()) ||
       (p.excerpt || "").toLowerCase().includes(search.toLowerCase());
     const matchTag = !activeTag || splitTags(p.tags).includes(activeTag);
     return matchSearch && matchTag;
   });
+
+  // In the grid, exclude the featured post from showing again if it's visible in the featured section
+  const gridPosts = filtered.filter(
+    (p) => !(featuredPost && p.id === featuredPost.id)
+  );
 
   return (
     <div className="dot-pattern min-h-screen flex flex-col">
@@ -460,73 +365,140 @@ export default function BlogPage() {
           </CardShell>
         </FadeIn>
 
+        {/* Featured Post Section */}
+        {featuredPost && (
+          <FadeIn>
+            <div className="mb-2">
+              <div className="flex items-center gap-2 mb-3">
+                <Star className="w-4 h-4 text-emerald fill-emerald" />
+                <h2 className="text-sm font-semibold text-foreground">Featured Post</h2>
+              </div>
+              <Link href={`/blog/${featuredPost.id}`}>
+                <CardShell className="overflow-hidden cursor-pointer">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
+                    {resolveImage(featuredPost) && (
+                      <div className="aspect-[16/9] md:aspect-auto overflow-hidden">
+                        <img
+                          src={resolveImage(featuredPost)}
+                          alt={featuredPost.title}
+                          className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                          loading="lazy"
+                        />
+                      </div>
+                    )}
+                    <div className="p-6 flex flex-col justify-center">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 text-[10px] font-semibold rounded-md bg-emerald/10 text-emerald">
+                          <Star className="w-2.5 h-2.5" /> Featured
+                        </span>
+                        {featuredPost.category && (
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 text-[10px] font-semibold rounded-md bg-emerald/10 text-emerald">
+                            <FolderOpen className="w-2.5 h-2.5" />
+                            {featuredPost.category}
+                          </span>
+                        )}
+                      </div>
+                      <h2 className="text-lg md:text-xl font-bold text-foreground leading-tight">
+                        {featuredPost.title}
+                      </h2>
+                      <div className="flex items-center gap-2 mt-2">
+                        <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+                          <Calendar className="w-3.5 h-3.5" /> {featuredPost.date}
+                        </span>
+                      </div>
+                      <p className="text-sm text-muted-foreground mt-2 line-clamp-3">
+                        {featuredPost.excerpt}
+                      </p>
+                      <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald hover:underline mt-4 self-start">
+                        Read More <ChevronRight className="w-3 h-3" />
+                      </span>
+                    </div>
+                  </div>
+                </CardShell>
+              </Link>
+            </div>
+          </FadeIn>
+        )}
+
         {/* Blog grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filtered.map((post, i) => {
+          {gridPosts.map((post, i) => {
             const postTags = splitTags(post.tags);
             const displayImage = resolveImage(post);
 
             return (
               <FadeIn key={post.id} delay={i * 0.06}>
-                <CardShell className="overflow-hidden h-full flex flex-col">
-                  {/* Featured image */}
-                  {displayImage && (
-                    <div className="aspect-[16/9] overflow-hidden">
-                      <img
-                        src={displayImage}
-                        alt={post.title}
-                        className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-                        loading="lazy"
-                      />
-                    </div>
-                  )}
-
-                  <div className="p-5 flex flex-col flex-1">
-                    {/* Category badge */}
-                    {post.category && (
-                      <span className="inline-flex items-center gap-1 w-fit px-2.5 py-0.5 text-[10px] font-semibold rounded-md bg-emerald/10 text-emerald mb-2.5">
-                        <FolderOpen className="w-2.5 h-2.5" />
-                        {post.category}
-                      </span>
-                    )}
-
-                    <h3 className="text-sm font-semibold text-foreground leading-snug">
-                      {post.title}
-                    </h3>
-
-                    <div className="flex items-center gap-2 mt-1.5">
-                      <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground">
-                        <Calendar className="w-3 h-3" /> {post.date}
-                      </span>
-                    </div>
-
-                    <p className="text-xs text-muted-foreground mt-2 flex-1">
-                      {post.excerpt}
-                    </p>
-
-                    {/* Tags as emerald pills */}
-                    {postTags.length > 0 && (
-                      <div className="flex flex-wrap gap-1.5 mt-3">
-                        {postTags.map((t) => (
-                          <span
-                            key={t}
-                            className="px-2 py-0.5 text-[10px] font-medium text-emerald bg-emerald/10 rounded-md"
-                          >
-                            {t}
+                <Link href={`/blog/${post.id}`}>
+                  <CardShell className="overflow-hidden h-full flex flex-col cursor-pointer">
+                    {/* Featured image */}
+                    {displayImage && (
+                      <div className="aspect-[16/9] overflow-hidden relative group">
+                        <img
+                          src={displayImage}
+                          alt={post.title}
+                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                          loading="lazy"
+                        />
+                        {/* Featured badge on image */}
+                        {post.featured && (
+                          <span className="absolute top-2 right-2 px-2 py-0.5 text-[10px] font-semibold text-white bg-emerald rounded-md flex items-center gap-1">
+                            <Star className="w-3 h-3" /> Featured
                           </span>
-                        ))}
+                        )}
                       </div>
                     )}
 
-                    {/* Read More */}
-                    <button
-                      onClick={() => setSelectedPost(post)}
-                      className="inline-flex items-center gap-1 text-xs font-medium text-emerald hover:underline mt-3 self-start"
-                    >
-                      Read More <ChevronRight className="w-3 h-3" />
-                    </button>
-                  </div>
-                </CardShell>
+                    <div className="p-5 flex flex-col flex-1">
+                      {/* Category badge */}
+                      {post.category && (
+                        <span className="inline-flex items-center gap-1 w-fit px-2.5 py-0.5 text-[10px] font-semibold rounded-md bg-emerald/10 text-emerald mb-2.5">
+                          <FolderOpen className="w-2.5 h-2.5" />
+                          {post.category}
+                        </span>
+                      )}
+
+                      {/* Featured badge (when no image) */}
+                      {!displayImage && post.featured && (
+                        <span className="inline-flex items-center gap-1 w-fit px-2.5 py-0.5 text-[10px] font-semibold rounded-md bg-emerald/10 text-emerald mb-2.5">
+                          <Star className="w-2.5 h-2.5" /> Featured
+                        </span>
+                      )}
+
+                      <h3 className="text-sm font-semibold text-foreground leading-snug">
+                        {post.title}
+                      </h3>
+
+                      <div className="flex items-center gap-2 mt-1.5">
+                        <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground">
+                          <Calendar className="w-3 h-3" /> {post.date}
+                        </span>
+                      </div>
+
+                      <p className="text-xs text-muted-foreground mt-2 flex-1">
+                        {post.excerpt}
+                      </p>
+
+                      {/* Tags as emerald pills */}
+                      {postTags.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5 mt-3">
+                          {postTags.map((t) => (
+                            <span
+                              key={t}
+                              className="px-2 py-0.5 text-[10px] font-medium text-emerald bg-emerald/10 rounded-md"
+                            >
+                              {t}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Read More */}
+                      <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald hover:underline mt-3 self-start">
+                        Read More <ChevronRight className="w-3 h-3" />
+                      </span>
+                    </div>
+                  </CardShell>
+                </Link>
               </FadeIn>
             );
           })}
@@ -545,7 +517,7 @@ export default function BlogPage() {
       {/* Footer */}
       <footer className="border-t border-border mt-6">
         <div className="max-w-6xl mx-auto px-4 py-5 text-center text-xs text-muted-foreground">
-          &copy; {new Date().getFullYear()} Alex Morgan. All rights reserved.
+          &copy; {new Date().getFullYear()} {profileName}. All rights reserved.
         </div>
       </footer>
 
@@ -559,16 +531,6 @@ export default function BlogPage() {
           <ArrowUp className="w-5 h-5" />
         </button>
       )}
-
-      {/* Blog Detail Modal */}
-      <AnimatePresence>
-        {selectedPost && (
-          <BlogDetailModal
-            post={selectedPost}
-            onClose={() => setSelectedPost(null)}
-          />
-        )}
-      </AnimatePresence>
 
       {/* Prose-like styling for blog HTML content */}
       <style jsx global>{`

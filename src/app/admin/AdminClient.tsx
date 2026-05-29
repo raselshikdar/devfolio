@@ -79,13 +79,14 @@ interface AdminData {
   socialLinks: any[];
   welcomePopups: any[];
   livePodcast: any;
+  blogComments: any[];
 }
 
 type Section =
   | "overview" | "profile" | "education" | "experience" | "skills"
   | "projects" | "gallery" | "audio" | "video"
   | "notes" | "quotes" | "codes" | "links"
-  | "blog" | "store" | "messages" | "guestbook" | "social" | "popup" | "podcast";
+  | "blog" | "store" | "messages" | "guestbook" | "social" | "popup" | "podcast" | "blog-comments";
 
 type FieldType =
   | "text" | "textarea" | "number" | "image" | "html"
@@ -117,6 +118,7 @@ const SECTIONS: { key: Section; label: string; icon: React.ElementType; group?: 
   { key: "links", label: "Links", icon: Link2, group: "More" },
   { key: "social", label: "Social Links", icon: Share2, group: "More" },
   { key: "messages", label: "Messages", icon: Mail, group: "Interactions" },
+  { key: "blog-comments", label: "Blog Comments", icon: MessageSquare, group: "Interactions" },
   { key: "guestbook", label: "Guestbook", icon: MessageSquare, group: "Interactions" },
   { key: "popup", label: "Welcome Popup", icon: Sparkles, group: "Content" },
   { key: "podcast", label: "Live Podcast", icon: Radio, group: "Media" },
@@ -195,6 +197,7 @@ const SECTION_FIELDS: Record<string, FieldConfig[]> = {
     { key: "category", label: "Category", type: "category" },
     { key: "content", label: "Content", type: "html" },
     { key: "published", label: "Published", type: "checkbox" },
+    { key: "featured", label: "Featured", type: "checkbox" },
   ],
   store: [
     { key: "name", label: "Product Name" },
@@ -220,6 +223,11 @@ const SECTION_FIELDS: Record<string, FieldConfig[]> = {
     { key: "buttonUrl", label: "Button URL" },
     { key: "enabled", label: "Enabled", type: "checkbox" },
     { key: "showOnce", label: "Show Only Once (remember dismissal)", type: "checkbox" },
+  ],
+  "blog-comments": [
+    { key: "name", label: "Author" },
+    { key: "content", label: "Comment", type: "textarea" },
+    { key: "hidden", label: "Hidden", type: "checkbox" },
   ],
   social: [
     { key: "platform", label: "Platform", type: "select", options: [
@@ -254,6 +262,7 @@ const SECTION_API: Record<string, string> = {
   social: "/api/admin/social",
   guestbook: "/api/admin/guestbook",
   popup: "/api/admin/popup",
+  "blog-comments": "/api/admin/blog-comments",
 };
 
 const DATA_KEY_MAP: Record<string, string> = {
@@ -273,6 +282,7 @@ const DATA_KEY_MAP: Record<string, string> = {
   social: "socialLinks",
   guestbook: "guestbookEntries",
   popup: "welcomePopups",
+  "blog-comments": "blogComments",
 };
 
 /* ─── Utility: cn helper ─── */

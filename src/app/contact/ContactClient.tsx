@@ -5,8 +5,6 @@ import { useTheme } from "next-themes";
 import { motion, useInView } from "framer-motion";
 import Link from "next/link";
 import {
-  Menu,
-  X,
   Sun,
   Moon,
   ArrowUp,
@@ -25,6 +23,9 @@ import {
   Clock,
   Globe,
   MessageSquare,
+  Menu,
+  X,
+  ExternalLink,
 } from "lucide-react";
 
 /* ─── Components ─── */
@@ -53,14 +54,19 @@ function CardShell({ children, className = "" }: { children: React.ReactNode; cl
   );
 }
 
-const SOCIAL_LINKS = [
-  { icon: Github, href: "#", label: "GitHub", handle: "@alexmorgan" },
-  { icon: Linkedin, href: "#", label: "LinkedIn", handle: "in/alexmorgan" },
-  { icon: Twitter, href: "#", label: "Twitter / X", handle: "@alexmorgan_dev" },
-  { icon: Instagram, href: "#", label: "Instagram", handle: "@alex.codes" },
-  { icon: Youtube, href: "#", label: "YouTube", handle: "Alex Morgan Dev" },
-  { icon: Facebook, href: "#", label: "Facebook", handle: "Alex Morgan" },
-  { icon: Dribbble, href: "#", label: "Dribbble", handle: "@alexmorgan" },
+const ICON_MAP: Record<string, React.ElementType> = {
+  github: Github, linkedin: Linkedin, twitter: Twitter, x: Twitter,
+  instagram: Instagram, youtube: Youtube, facebook: Facebook,
+  dribbble: Dribbble, mail: Mail, send: Globe, globe: Globe,
+};
+
+const NAV_LINKS = [
+  { label: "Home", href: "/" },
+  { label: "Projects", href: "/projects" },
+  { label: "Blog", href: "/blog" },
+  { label: "Gallery", href: "/gallery" },
+  { label: "Store", href: "/store" },
+  { label: "Contact", href: "/contact" },
 ];
 
 /* ─── Page ─── */
@@ -73,6 +79,16 @@ export default function ContactPage() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
+  const [profile, setProfile] = useState({
+    name: "Rasel Shikdar",
+    email: "info@raselsh.pro.bd",
+    phone: "",
+    location: "",
+    website: "",
+    avatar: "",
+  });
+  const [socialLinks, setSocialLinks] = useState<any[]>([]);
+
   useEffect(() => {
     if (!mountedRef.current) {
       mountedRef.current = true;
@@ -84,6 +100,22 @@ export default function ContactPage() {
     const onScroll = () => setShowTop(window.scrollY > 300);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    const onResize = () => { if (window.innerWidth >= 768) setMobileOpen(false); };
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
+  useEffect(() => {
+    fetch("/api/data")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.profile) setProfile((p) => ({ ...p, ...data.profile }));
+        if (data.socialLinks?.length) setSocialLinks(data.socialLinks);
+      })
+      .catch(() => {});
   }, []);
 
   const [formData, setFormData] = useState({ name: "", email: "", subject: "", message: "" });
@@ -104,14 +136,38 @@ export default function ContactPage() {
     } catch { /* ignore */ }
   };
 
+  const contactDetails = [
+    { icon: Mail, label: "Email", value: profile.email || "info@raselsh.pro.bd" },
+    { icon: Phone, label: "Phone", value: profile.phone, show: !!profile.phone },
+    { icon: MapPin, label: "Location", value: profile.location, show: !!profile.location },
+    { icon: Clock, label: "Availability", value: "Mon – Fri, 9 AM – 6 PM" },
+    { icon: Globe, label: "Website", value: profile.website, show: !!profile.website },
+  ].filter((d) => d.show !== false);
+
   return (
     <div className="dot-pattern min-h-screen flex flex-col">
       {/* Navbar */}
       <header className="sticky top-0 z-50 backdrop-blur-md bg-background/80 border-b border-border">
         <nav className="max-w-6xl mx-auto flex items-center justify-between h-14 px-4">
           <Link href="/" className="text-lg font-bold text-foreground tracking-tight">
-            <span className="text-emerald">A</span>lex<span className="text-emerald">.</span>
+            <span className="text-emerald">{profile.name?.charAt(0) || "R"}</span>{profile.name?.slice(1).split(" ")[0] || "asel"}<span className="text-emerald">.</span>
           </Link>
+          <ul className="hidden md:flex items-center gap-1">
+            {NAV_LINKS.map((l) => (
+              <li key={l.href}>
+                <Link
+                  href={l.href}
+                  className={`px-3 py-1.5 text-sm font-medium transition-colors rounded-md ${
+                    l.href === "/contact"
+                      ? "text-emerald bg-emerald/5"
+                      : "text-muted-foreground hover:text-emerald hover:bg-emerald/5"
+                  }`}
+                >
+                  {l.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
           <div className="flex items-center gap-2">
             {mounted && (
               <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")} aria-label="Toggle theme" className="w-9 h-9 rounded-lg border border-border flex items-center justify-center hover:border-emerald transition-colors">
@@ -123,6 +179,26 @@ export default function ContactPage() {
             </button>
           </div>
         </nav>
+        {mobileOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="md:hidden overflow-hidden border-t border-border bg-background/95 backdrop-blur-md"
+          >
+            <ul className="flex flex-col px-4 py-2">
+              {NAV_LINKS.map((l) => (
+                <li key={l.href}>
+                  <Link href={l.href} onClick={() => setMobileOpen(false)} className={`block py-2.5 text-sm font-medium transition-colors ${
+                    l.href === "/contact" ? "text-emerald" : "text-muted-foreground hover:text-emerald"
+                  }`}>
+                    {l.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </motion.div>
+        )}
       </header>
 
       <main className="flex-1 max-w-6xl mx-auto w-full px-4 py-6 space-y-6">
@@ -231,83 +307,56 @@ export default function ContactPage() {
                   <h2 className="text-xl font-semibold text-foreground">Get in Touch</h2>
                 </div>
                 <div className="space-y-4">
-                  <div className="flex items-start gap-3">
-                    <div className="w-9 h-9 rounded-lg border border-border flex items-center justify-center shrink-0">
-                      <Mail className="w-4 h-4 text-muted-foreground" />
+                  {contactDetails.map(({ icon: Icon, label, value }) => (
+                    <div key={label} className="flex items-start gap-3">
+                      <div className="w-9 h-9 rounded-lg border border-border flex items-center justify-center shrink-0">
+                        <Icon className="w-4 h-4 text-muted-foreground" />
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground">{label}</p>
+                        <p className="text-sm font-medium text-foreground">{value}</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground">Email</p>
-                      <p className="text-sm font-medium text-foreground">alex.morgan@email.com</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-9 h-9 rounded-lg border border-border flex items-center justify-center shrink-0">
-                      <Phone className="w-4 h-4 text-muted-foreground" />
-                    </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground">Phone</p>
-                      <p className="text-sm font-medium text-foreground">+1 (555) 123-4567</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-9 h-9 rounded-lg border border-border flex items-center justify-center shrink-0">
-                      <MapPin className="w-4 h-4 text-muted-foreground" />
-                    </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground">Location</p>
-                      <p className="text-sm font-medium text-foreground">San Francisco, CA</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-9 h-9 rounded-lg border border-border flex items-center justify-center shrink-0">
-                      <Clock className="w-4 h-4 text-muted-foreground" />
-                    </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground">Availability</p>
-                      <p className="text-sm font-medium text-foreground">Mon – Fri, 9 AM – 6 PM PST</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-9 h-9 rounded-lg border border-border flex items-center justify-center shrink-0">
-                      <Globe className="w-4 h-4 text-muted-foreground" />
-                    </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground">Website</p>
-                      <p className="text-sm font-medium text-foreground">alexmorgan.dev</p>
-                    </div>
-                  </div>
+                  ))}
                 </div>
               </CardShell>
             </FadeIn>
 
             {/* Social links */}
-            <FadeIn>
-              <CardShell className="p-6">
-                <div className="flex items-center gap-2 mb-5">
-                  <div className="w-8 h-8 rounded-lg bg-emerald/10 flex items-center justify-center">
-                    <Globe className="w-4 h-4 text-emerald" />
+            {socialLinks.length > 0 && (
+              <FadeIn>
+                <CardShell className="p-6">
+                  <div className="flex items-center gap-2 mb-5">
+                    <div className="w-8 h-8 rounded-lg bg-emerald/10 flex items-center justify-center">
+                      <Globe className="w-4 h-4 text-emerald" />
+                    </div>
+                    <h2 className="text-xl font-semibold text-foreground">Social</h2>
                   </div>
-                  <h2 className="text-xl font-semibold text-foreground">Social</h2>
-                </div>
-                <div className="space-y-2">
-                  {SOCIAL_LINKS.map(({ icon: Icon, href, label, handle }) => (
-                    <a
-                      key={label}
-                      href={href}
-                      className="flex items-center gap-3 p-2.5 rounded-xl border border-border hover:border-emerald transition-colors group"
-                    >
-                      <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center group-hover:bg-emerald/10 transition-colors">
-                        <Icon className="w-4 h-4 text-muted-foreground group-hover:text-emerald transition-colors" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-medium text-foreground">{label}</p>
-                        <p className="text-[10px] text-muted-foreground truncate">{handle}</p>
-                      </div>
-                    </a>
-                  ))}
-                </div>
-              </CardShell>
-            </FadeIn>
+                  <div className="space-y-2">
+                    {socialLinks.map(({ id, platform, url, icon, handle }) => {
+                      const Icon = ICON_MAP[icon?.toLowerCase()] || ExternalLink;
+                      return (
+                        <a
+                          key={id}
+                          href={url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-3 p-2.5 rounded-xl border border-border hover:border-emerald transition-colors group"
+                        >
+                          <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center group-hover:bg-emerald/10 transition-colors">
+                            <Icon className="w-4 h-4 text-muted-foreground group-hover:text-emerald transition-colors" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs font-medium text-foreground">{platform}</p>
+                            <p className="text-[10px] text-muted-foreground truncate">{handle || url}</p>
+                          </div>
+                        </a>
+                      );
+                    })}
+                  </div>
+                </CardShell>
+              </FadeIn>
+            )}
           </div>
         </div>
       </main>
@@ -315,7 +364,7 @@ export default function ContactPage() {
       {/* Footer */}
       <footer className="border-t border-border mt-6">
         <div className="max-w-6xl mx-auto px-4 py-5 text-center text-xs text-muted-foreground">
-          &copy; {new Date().getFullYear()} Alex Morgan. All rights reserved.
+          &copy; {new Date().getFullYear()} {profile.name}. All rights reserved.
         </div>
       </footer>
 

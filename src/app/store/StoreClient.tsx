@@ -15,6 +15,7 @@ import {
   Star,
   Filter,
   ExternalLink,
+  ChevronRight,
 } from "lucide-react";
 
 /* ─── Types ─── */
@@ -29,6 +30,7 @@ interface StoreProduct {
   category?: string | null;
   rating?: number | null;
   buyUrl?: string | null;
+  featured?: boolean;
 }
 
 /* ─── Fallback Data ─── */
@@ -43,6 +45,7 @@ const FALLBACK_PRODUCTS: StoreProduct[] = [
     description: "50+ premium React components with dark mode support, fully customizable with Tailwind CSS.",
     category: "Components",
     rating: 4.8,
+    featured: true,
   },
   {
     id: "st2",
@@ -53,6 +56,7 @@ const FALLBACK_PRODUCTS: StoreProduct[] = [
     description: "Comprehensive guide to 30+ custom React hooks with practical examples and best practices.",
     category: "Books",
     rating: 4.9,
+    featured: true,
   },
   {
     id: "st3",
@@ -63,6 +67,7 @@ const FALLBACK_PRODUCTS: StoreProduct[] = [
     description: "Complete Figma design system with 200+ components, auto-layout, and design tokens.",
     category: "Design",
     rating: 4.7,
+    featured: false,
   },
   {
     id: "st4",
@@ -73,6 +78,7 @@ const FALLBACK_PRODUCTS: StoreProduct[] = [
     description: "Production-ready Next.js boilerplate with auth, database, payments, and CI/CD pipeline.",
     category: "Templates",
     rating: 4.6,
+    featured: false,
   },
   {
     id: "st5",
@@ -83,6 +89,7 @@ const FALLBACK_PRODUCTS: StoreProduct[] = [
     description: "E-book covering REST, GraphQL, and tRPC patterns with TypeScript examples and testing strategies.",
     category: "Books",
     rating: 4.5,
+    featured: false,
   },
   {
     id: "st6",
@@ -93,6 +100,7 @@ const FALLBACK_PRODUCTS: StoreProduct[] = [
     description: "500+ hand-crafted SVG icons in 4 styles — line, solid, duotone, and thin. Figma plugin included.",
     category: "Design",
     rating: 4.8,
+    featured: false,
   },
   {
     id: "st7",
@@ -103,6 +111,7 @@ const FALLBACK_PRODUCTS: StoreProduct[] = [
     description: "Admin dashboard template with 40+ pages, charts, tables, and authentication flows.",
     category: "Templates",
     rating: 4.9,
+    featured: false,
   },
   {
     id: "st8",
@@ -113,6 +122,7 @@ const FALLBACK_PRODUCTS: StoreProduct[] = [
     description: "80+ copy-paste CSS animations with React hooks integration. Zero dependencies, 3KB gzipped.",
     category: "Components",
     rating: 4.7,
+    featured: false,
   },
   {
     id: "st9",
@@ -123,6 +133,7 @@ const FALLBACK_PRODUCTS: StoreProduct[] = [
     description: "Printable reference card covering advanced TypeScript patterns, utility types, and best practices.",
     category: "Books",
     rating: 4.4,
+    featured: false,
   },
 ];
 
@@ -200,6 +211,7 @@ export default function StorePage() {
   const [sortBy, setSortBy] = useState<"default" | "price-low" | "price-high" | "rating">("default");
   const [products, setProducts] = useState<StoreProduct[]>(FALLBACK_PRODUCTS);
   const [loading, setLoading] = useState(true);
+  const [profileName, setProfileName] = useState("Rasel Shikdar");
 
   /* ─── Mount ─── */
   useEffect(() => {
@@ -217,6 +229,7 @@ export default function StorePage() {
         if (!res.ok) return;
         const data = await res.json();
         if (data.storeProducts?.length) setProducts(data.storeProducts);
+        if (data.profile?.name) setProfileName(data.profile.name);
       } catch {
         // Keep fallback data on error
       } finally {
@@ -239,8 +252,19 @@ export default function StorePage() {
     ...Array.from(new Set(products.map((p) => p.category).filter(Boolean) as string[])),
   ];
 
+  // Sort: featured products first
+  const sortedProducts = [...products].sort((a, b) => {
+    if (a.featured && !b.featured) return -1;
+    if (!a.featured && b.featured) return 1;
+    return 0;
+  });
+
+  // Featured product: prefer explicitly featured, else highest rated
+  const featuredProduct = sortedProducts.find((p) => p.featured) ||
+    [...sortedProducts].sort((a, b) => (b.rating || 0) - (a.rating || 0))[0];
+
   /* ─── Derived: filtered & sorted ─── */
-  let filtered = products.filter((p) => {
+  let filtered = sortedProducts.filter((p) => {
     const matchSearch =
       p.name.toLowerCase().includes(search.toLowerCase()) ||
       (p.description || "").toLowerCase().includes(search.toLowerCase());
@@ -251,6 +275,11 @@ export default function StorePage() {
   if (sortBy === "price-low") filtered = [...filtered].sort((a, b) => parsePrice(a.price) - parsePrice(b.price));
   else if (sortBy === "price-high") filtered = [...filtered].sort((a, b) => parsePrice(b.price) - parsePrice(a.price));
   else if (sortBy === "rating") filtered = [...filtered].sort((a, b) => (b.rating || 0) - (a.rating || 0));
+
+  // In the grid, exclude the featured product if it's shown in the featured section
+  const gridProducts = filtered.filter(
+    (p) => !(featuredProduct && p.id === featuredProduct.id)
+  );
 
   return (
     <div className="dot-pattern min-h-screen flex flex-col">
@@ -359,6 +388,87 @@ export default function StorePage() {
           </CardShell>
         </FadeIn>
 
+        {/* ─── Featured Product Section ─── */}
+        {featuredProduct && (
+          <FadeIn>
+            <div className="mb-2">
+              <div className="flex items-center gap-2 mb-3">
+                <Star className="w-4 h-4 text-emerald fill-emerald" />
+                <h2 className="text-sm font-semibold text-foreground">Featured Product</h2>
+              </div>
+              <Link href={`/store/${featuredProduct.id}`}>
+                <CardShell className="overflow-hidden cursor-pointer">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
+                    {resolveImage(featuredProduct) && (
+                      <div className="aspect-[4/2.6] md:aspect-auto overflow-hidden">
+                        <img
+                          src={resolveImage(featuredProduct)}
+                          alt={featuredProduct.name}
+                          className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                          loading="lazy"
+                        />
+                      </div>
+                    )}
+                    <div className="p-6 flex flex-col justify-center">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 text-[10px] font-semibold rounded-md bg-emerald/10 text-emerald">
+                          <Star className="w-2.5 h-2.5" /> Featured
+                        </span>
+                        {featuredProduct.category && (
+                          <span className="px-2 py-0.5 text-[10px] font-medium text-emerald bg-emerald/10 rounded-md">
+                            {featuredProduct.category}
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-start justify-between gap-2">
+                        <h2 className="text-lg md:text-xl font-bold text-foreground leading-tight">
+                          {featuredProduct.name}
+                        </h2>
+                        <span className="text-lg text-emerald font-bold shrink-0">{featuredProduct.price}</span>
+                      </div>
+                      {featuredProduct.description && (
+                        <p className="text-sm text-muted-foreground mt-2 line-clamp-3">
+                          {featuredProduct.description}
+                        </p>
+                      )}
+                      <div className="flex items-center gap-3 mt-3">
+                        {featuredProduct.rating != null && (
+                          <div className="flex items-center gap-1.5">
+                            <StarRating rating={featuredProduct.rating} />
+                            <span className="text-xs text-muted-foreground font-medium">
+                              {featuredProduct.rating.toFixed(1)}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-3 mt-4">
+                        <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald hover:underline">
+                          View Details <ChevronRight className="w-3 h-3" />
+                        </span>
+                        {featuredProduct.buyUrl ? (
+                          <a
+                            href={featuredProduct.buyUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="px-3 py-1.5 rounded-lg bg-emerald text-white text-xs font-semibold hover:bg-emerald-hover transition-colors inline-flex items-center gap-1"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            Buy Now <ExternalLink className="w-3 h-3" />
+                          </a>
+                        ) : (
+                          <span className="px-3 py-1.5 rounded-lg bg-emerald text-white text-xs font-semibold">
+                            Buy Now
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </CardShell>
+              </Link>
+            </div>
+          </FadeIn>
+        )}
+
         {/* ─── Loading skeleton ─── */}
         {loading && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -389,79 +499,88 @@ export default function StorePage() {
         {/* ─── Product grid ─── */}
         {!loading && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filtered.map((item, i) => {
+            {gridProducts.map((item, i) => {
               const imgSrc = resolveImage(item);
               return (
                 <FadeIn key={item.id} delay={i * 0.06}>
-                  <CardShell className="overflow-hidden h-full flex flex-col">
-                    {/* Featured image */}
-                    {imgSrc && (
-                      <div className="aspect-[4/2.6] overflow-hidden relative group">
-                        <img
-                          src={imgSrc}
-                          alt={item.name}
-                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                          loading="lazy"
-                        />
-                        {/* Overlay gradient */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                        {/* Category badge on image */}
-                        {item.category && (
-                          <span className="absolute top-2 right-2 px-2 py-0.5 text-[10px] font-semibold text-white bg-emerald/90 backdrop-blur-sm rounded-md">
-                            {item.category}
-                          </span>
-                        )}
-                      </div>
-                    )}
-
-                    <div className="p-4 flex flex-col flex-1">
-                      {/* Title + Price */}
-                      <div className="flex items-start justify-between gap-2">
-                        <h3 className="text-sm font-semibold text-foreground">{item.name}</h3>
-                        <span className="text-sm text-emerald font-bold shrink-0">{item.price}</span>
-                      </div>
-
-                      {/* Description (2-line clamp) */}
-                      {item.description && (
-                        <p className="text-xs text-muted-foreground mt-1.5 line-clamp-2 leading-relaxed">
-                          {item.description}
-                        </p>
-                      )}
-
-                      {/* Rating + Category + Buy Now */}
-                      <div className="flex items-center justify-between mt-3 pt-3 border-t border-border">
-                        <div className="flex items-center gap-2">
-                          {item.rating != null && (
-                            <>
-                              <StarRating rating={item.rating} />
-                              <span className="text-[10px] text-muted-foreground font-medium">
-                                {item.rating.toFixed(1)}
-                              </span>
-                            </>
-                          )}
-                          {!imgSrc && item.category && (
-                            <span className="px-1.5 py-0.5 text-[10px] text-emerald bg-emerald/10 rounded">
+                  <Link href={`/store/${item.id}`}>
+                    <CardShell className="overflow-hidden h-full flex flex-col cursor-pointer">
+                      {/* Featured image */}
+                      {imgSrc && (
+                        <div className="aspect-[4/2.6] overflow-hidden relative group">
+                          <img
+                            src={imgSrc}
+                            alt={item.name}
+                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                            loading="lazy"
+                          />
+                          {/* Overlay gradient */}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                          {/* Category badge on image */}
+                          {item.category && (
+                            <span className="absolute top-2 right-2 px-2 py-0.5 text-[10px] font-semibold text-white bg-emerald/90 backdrop-blur-sm rounded-md">
                               {item.category}
                             </span>
                           )}
+                          {/* Featured badge on image */}
+                          {item.featured && (
+                            <span className="absolute top-2 left-2 px-2 py-0.5 text-[10px] font-semibold text-white bg-emerald rounded-md flex items-center gap-1">
+                              <Star className="w-3 h-3" /> Featured
+                            </span>
+                          )}
                         </div>
-                        {item.buyUrl ? (
-                          <a
-                            href={item.buyUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="px-3 py-1.5 rounded-lg bg-emerald text-white text-xs font-semibold hover:bg-emerald-hover transition-colors inline-flex items-center gap-1"
-                          >
-                            Buy Now <ExternalLink className="w-3 h-3" />
-                          </a>
-                        ) : (
-                          <button className="px-3 py-1.5 rounded-lg bg-emerald text-white text-xs font-semibold hover:bg-emerald-hover transition-colors">
-                            Buy Now
-                          </button>
+                      )}
+
+                      <div className="p-4 flex flex-col flex-1">
+                        {/* Title + Price */}
+                        <div className="flex items-start justify-between gap-2">
+                          <h3 className="text-sm font-semibold text-foreground">{item.name}</h3>
+                          <span className="text-sm text-emerald font-bold shrink-0">{item.price}</span>
+                        </div>
+
+                        {/* Description (2-line clamp) */}
+                        {item.description && (
+                          <p className="text-xs text-muted-foreground mt-1.5 line-clamp-2 leading-relaxed">
+                            {item.description}
+                          </p>
                         )}
+
+                        {/* Rating + Category + Buy Now */}
+                        <div className="flex items-center justify-between mt-3 pt-3 border-t border-border">
+                          <div className="flex items-center gap-2">
+                            {item.rating != null && (
+                              <>
+                                <StarRating rating={item.rating} />
+                                <span className="text-[10px] text-muted-foreground font-medium">
+                                  {item.rating.toFixed(1)}
+                                </span>
+                              </>
+                            )}
+                            {!imgSrc && item.category && (
+                              <span className="px-1.5 py-0.5 text-[10px] text-emerald bg-emerald/10 rounded">
+                                {item.category}
+                              </span>
+                            )}
+                          </div>
+                          {item.buyUrl ? (
+                            <a
+                              href={item.buyUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="px-3 py-1.5 rounded-lg bg-emerald text-white text-xs font-semibold hover:bg-emerald-hover transition-colors inline-flex items-center gap-1"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              Buy Now <ExternalLink className="w-3 h-3" />
+                            </a>
+                          ) : (
+                            <span className="px-3 py-1.5 rounded-lg bg-emerald text-white text-xs font-semibold">
+                              Buy Now
+                            </span>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  </CardShell>
+                    </CardShell>
+                  </Link>
                 </FadeIn>
               );
             })}
@@ -496,7 +615,7 @@ export default function StorePage() {
       {/* ─── Footer ─── */}
       <footer className="border-t border-border mt-6">
         <div className="max-w-6xl mx-auto px-4 py-5 text-center text-xs text-muted-foreground">
-          &copy; {new Date().getFullYear()} Alex Morgan. All rights reserved.
+          &copy; {new Date().getFullYear()} {profileName}. All rights reserved.
         </div>
       </footer>
 
